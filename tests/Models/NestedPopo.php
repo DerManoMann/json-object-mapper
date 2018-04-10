@@ -20,6 +20,8 @@ class NestedPopo implements \JsonSerializable
     protected $proString = null;
     protected $proSimple = null;
     protected $proInter = null;
+    protected $proArrObj = null;
+    protected $proStdC = null;
 
     /**
      */
@@ -64,6 +66,34 @@ class NestedPopo implements \JsonSerializable
     }
 
     /**
+     */
+    public function getProArrObj():?\ArrayObject
+    {
+        return $this->proArrObj;
+    }
+
+    /**
+     */
+    public function setProArrObj(?\ArrayObject $proArrObj)
+    {
+        $this->proArrObj = $proArrObj;
+    }
+
+    /**
+     */
+    public function getProStdC():?\stdClass
+    {
+        return $this->proStdC;
+    }
+
+    /**
+     */
+    public function setProStdC(?\stdClass $proStdC)
+    {
+        $this->proStdC = $proStdC;
+    }
+
+    /**
      * @inheritdoc
      */
     public function jsonSerialize()
@@ -72,6 +102,8 @@ class NestedPopo implements \JsonSerializable
             'proString' => $this->proString,
             'proSimple' => $this->proSimple,
             'proInter' => $this->proInter,
+            'proArrObj' => $this->proArrObj,
+            'proStdC' => $this->proStdC,
         ];
     }
 }
