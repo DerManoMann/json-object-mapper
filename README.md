@@ -22,7 +22,9 @@ class MyClass
 $objectMapper = new \Radebatz\ObjectMapper\ObjectMapper();
 
 $json = '{"foo":"bar"}';
-/** @var \MyData */git commit -a
+
+/** @var \MyData $myData */
 $myData = $objectMapper->map($json, \MyData::class);
+
 echo $myData->getFoo(); // echo's 'bar'
 ````
