@@ -1,0 +1,40 @@
+{
+    "name": "radebatz/object-mapper",
+    "description": "(Json) Object mapper.",
+    "license": [
+        "MIT"
+    ],
+    "homepage": "http://radebatz.net/mano/",
+    "authors": [
+        {
+            "name": "Martin Rademacher",
+            "email": "mano@radebatz.org"
+        }
+    ],
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Radebatz\\ObjectMapper\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Radebatz\\ObjectMapper\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "require": {
+        "php": ">=7.1",
+        "symfony/property-info": "^4.0",
+        "phpdocumentor/reflection-docblock": "^4.0",
+        "symfony/property-access": "^4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0",
+        "friendsofphp/php-cs-fixer": "^2.11"
+    }
+}
