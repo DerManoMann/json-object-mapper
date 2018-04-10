@@ -225,13 +225,13 @@ class ObjectMapper
         $typeClass = $typeReference->getClassName();
         $typeClass = $this->resolveTypeClass($typeClass, $json);
         $collection = [];
-        foreach ((array) $json as $key => $value) {
+        foreach ((array)$json as $key => $value) {
             $collection[$key] = $this->populate($value, new $typeClass());
         }
 
         $collectionClass = $typeReference->getCollectionType();
 
-        return \stdClass::class == $collectionClass ? (object) $collection : new $collectionClass($collection);
+        return \stdClass::class == $collectionClass ? (object)$collection : new $collectionClass($collection);
     }
 
     /**
@@ -249,6 +249,12 @@ class ObjectMapper
 
         $properties = $this->propertyInfoExtractor->getProperties($class = get_class($obj));
 
+        $simpleClass = false;
+        if (($obj instanceof \ArrayObject) || \stdClass::class == $class) {
+            $simpleClass = true;
+            $properties = array_keys((array)$json);
+        }
+
         $mappedProperties = [];
         foreach ($json as $jkey => $jval) {
             $keys = array_map(function ($namingMapper) use ($jkey) {
@@ -258,7 +264,7 @@ class ObjectMapper
             $mapped = false;
             foreach ($keys as $key) {
                 if ($key && in_array($key, $properties)) {
-                    if (!$this->propertyInfoExtractor->isWritable($class, $key)) {
+                    if (!$simpleClass && !$this->propertyInfoExtractor->isWritable($class, $key)) {
                         throw new ObjectMapperException(sprintf('Cannot set property value %s', $key));
                     }
                     if ($type = $this->propertyInfoExtractor->getTypes($class, $key)) {
@@ -273,9 +279,19 @@ class ObjectMapper
                         $jval = $this->readInto($jval, new ClassTypeReference($jvalType));
                     }
 
+                    if ($simpleClass) {
+                        if (($obj instanceof \ArrayObject)) {
+                            $obj[$key] = $jval;
+                        } else {
+                            $obj->$key = $jval;
+                        }
+                    } else {
+                        $this->propertyAccessor->setValue($obj, $key, $jval);
+                    }
+
                     $mapped = true;
                     $mappedProperties[] = $key;
-                    $this->propertyAccessor->setValue($obj, $key, $jval);
+
                     break;
                 }
             }

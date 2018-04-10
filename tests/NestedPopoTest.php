@@ -24,9 +24,9 @@ class NestedPopoTest extends TestCase
     {
         return [
             ['{"proString":"pro"}'],
-            ['{"proSimple":{}}'],
-            ['{"proString":"pro", "proSimple":{}}'],
-            ['{"proString":"pro", "proSimple":{"proString":null,"proBool":false}}'],
+            ['{"proString":"pro", "proSimple":{"proString":"yup","proBool":false}}'],
+            ['{"proString":"pro", "proArrObj":{"proString":"yup","proBool":false}}'],
+            ['{"proString":"pro", "proStdC":{"proString":"yup","proBool":false}}'],
         ];
     }
 
@@ -39,6 +39,19 @@ class NestedPopoTest extends TestCase
 
         $popo1 = $objectMapper->map($json, Models\NestedPopo::class);
         $this->assertInstanceOf(Models\NestedPopo::class, $popo1);
+        if (($proSimple = $popo1->getProSimple())) {
+            $this->assertEquals('yup', $proSimple->getProString());
+        }
+        if (($proArrObj = $popo1->getProArrObj())) {
+            $this->assertInstanceOf(\ArrayObject::class, $proArrObj);
+            $this->assertTrue($proArrObj->offsetExists('proString'));
+            $this->assertEquals('yup', $proArrObj['proString']);
+        }
+        if (($proStdC = $popo1->getProStdC())) {
+            $this->assertEquals(\stdClass::class, get_class($proStdC));
+            $this->assertTrue(property_exists($proStdC, 'proString'));
+            $this->assertEquals('yup', $proStdC->proString);
+        }
         $popo2 = $objectMapper->map(json_encode($popo1), Models\NestedPopo::class);
         $this->assertEquals($popo1, $popo2);
     }
