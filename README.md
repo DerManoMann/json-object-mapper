@@ -1,5 +1,5 @@
 # (JSON) object mapper
-A simple library to deserialize JSON into (nested) PHP  arrays objects.
+A simple library to deserialize JSON into (nested) PHP  arrays / objects.
 
 ## Examples
 ````
@@ -22,6 +22,7 @@ class MyClass
 $objectMapper = new \Radebatz\ObjectMapper\ObjectMapper();
 
 $json = '{"foo":"bar"}';
+/** @var \MyData */git commit -a
 $myData = $objectMapper->map($json, \MyData::class);
 echo $myData->getFoo(); // echo's 'bar'
 ````
