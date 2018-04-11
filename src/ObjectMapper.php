@@ -208,7 +208,7 @@ class ObjectMapper
         $obj = null;
         if (!$properties && 1 == count((array) $json)) {
             $obj = $singleValueCtorInstance($typeClass, $json);
-        } elseif (1 == count($properties) && 1 == count($json)) {
+        } elseif (1 == count($properties) && 1 == count((array) $json)) {
             if (!$this->propertyInfoExtractor->isWritable($typeClass, $properties[0])) {
                 $obj = $singleValueCtorInstance($typeClass, $json);
             }
