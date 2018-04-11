@@ -1,6 +1,8 @@
 # (JSON) object mapper
 A simple library to deserialize JSON into (nested) PHP  arrays / objects.
 
+[![Build Status](https://travis-ci.org/DerManoMann/json-object-mapper.png)](https://travis-ci.org/DerManoMann/json-object-mapper)
+
 ## Examples
 ````
 class MyClass 
