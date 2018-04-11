@@ -23,11 +23,6 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
- * TODO:
- * * caching of things expensive
- * * logging
- * * handling of:
- *   * strict type checking: object compat, null ?
  */
 class ObjectMapper
 {
@@ -39,6 +34,7 @@ class ObjectMapper
     protected $propertyAccessor;
     protected $typeMappers;
     protected $namingMappers;
+    protected $reflectionClasses;
 
     /**
      */
@@ -56,6 +52,7 @@ class ObjectMapper
         $this->namingMappers = [
             new DefaultCase(),
         ];
+        $this->reflectionClasses = [];
     }
 
     /**
@@ -89,6 +86,17 @@ class ObjectMapper
             'verifyRequiredProperties' => false,
             'unknownPropertyHandler' => null,
         ];
+    }
+
+    /**
+     */
+    protected function getReflectionClass($className): \ReflectionClass
+    {
+        if (!array_key_exists($className, $this->reflectionClasses)) {
+            $this->reflectionClasses[$className] = new \ReflectionClass(($className));
+        }
+
+        return $this->reflectionClasses[$className];
     }
 
     /**
@@ -127,7 +135,7 @@ class ObjectMapper
      */
     protected function resolveTypeClass($typeClass, $json)
     {
-        $rc = new \ReflectionClass($typeClass);
+        $rc = $this->getReflectionClass($typeClass);
         if (!$rc->isInstantiable()) {
             foreach ($this->typeMappers as $typeMapper) {
                 if ($mappedTypeClass = $typeMapper->resolve($typeClass, $json)) {
@@ -176,6 +184,46 @@ class ObjectMapper
     }
 
     /**
+     * Creates typeClass instances and handles single value ctor injection
+     */
+    protected function instantiate($typeClass, $json, $properties)
+    {
+        $singleValueCtorInstance = function($typeClass, $json) {
+            $obj = null;
+            if ($rc = $this->getReflectionClass($typeClass)) {
+                $cm = $rc->getConstructor();
+                if ($cm && $cp = $cm->getParameters()) {
+                    if (1 == count($cp) || $cp[1]->isDefaultValueAvailable()) {
+                        // single arg ctor
+                        $needsPopulate = false;
+                        $arr = (array)$json;
+                        $obj = new $typeClass(array_pop($arr));
+                    }
+                }
+            }
+
+            return $obj;
+        };
+
+        $obj = null;
+        if (!$properties && 1 == count($json)) {
+            $obj = $singleValueCtorInstance($typeClass, $json);
+        } elseif (1 == count($properties) && 1 == count($json)) {
+            if (!$this->propertyInfoExtractor->isWritable($typeClass, $properties[0])) {
+                $obj = $singleValueCtorInstance($typeClass, $json);
+            }
+        }
+
+        $needsPopulate = false;
+        if (!$obj) {
+            $obj = new $typeClass();
+            $needsPopulate = true;
+        }
+
+        return [$obj, $needsPopulate];
+    }
+
+    /**
      * Map Json to (nested) object(s).
      *
      * @param array|object|string $json The JSON data
@@ -197,7 +245,7 @@ class ObjectMapper
                 $typeReference = new ObjectTypeReference($type);
             }
         } else {
-            $typeReference = new ObjectTypeReference(new $type());
+            $typeReference = new ClassTypeReference($type);
         }
 
         return $this->readInto($jsonResolved, $typeReference);
@@ -217,16 +265,20 @@ class ObjectMapper
         } elseif (ClassTypeReference::class === get_class($typeReference)) {
             $typeClass = $typeReference->getClassName();
             $typeClass = $this->resolveTypeClass($typeClass, $json);
+            $properties = $this->propertyInfoExtractor->getProperties($typeClass);
+            list($obj, $needsPopulate) = $this->instantiate($typeClass, $json, $properties);
 
-            return $this->populate($json, new $typeClass());
+            return $needsPopulate ? $this->populate($json, $obj) : $obj;
         }
 
         // collection
         $typeClass = $typeReference->getClassName();
         $typeClass = $this->resolveTypeClass($typeClass, $json);
+        $properties = $this->propertyInfoExtractor->getProperties($typeClass);
         $collection = [];
         foreach ((array)$json as $key => $value) {
-            $collection[$key] = $this->populate($value, new $typeClass());
+            list($obj, $needsPopulate) = $this->instantiate($typeClass, $json, $properties);
+            $collection[$key] = $needsPopulate ? $this->populate($value, $obj) : $obj;
         }
 
         $collectionClass = $typeReference->getCollectionType();
@@ -241,13 +293,13 @@ class ObjectMapper
      * @param mixed $obj The value object to populate
      * @return mixed The value object
      */
-    protected function populate($json, $obj)
+    protected function populate($json, $obj, $properties = null)
     {
         if (is_array($json) && !($obj instanceof \ArrayObject)) {
             throw new ObjectMapperException('Collection type mismatch: expecting object, got array');
         }
 
-        $properties = $this->propertyInfoExtractor->getProperties($class = get_class($obj));
+        $properties = $properties ?: $this->propertyInfoExtractor->getProperties($class = get_class($obj));
 
         $simpleClass = false;
         if (($obj instanceof \ArrayObject) || \stdClass::class == $class) {
