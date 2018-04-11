@@ -3,4 +3,3 @@
 * logging
 * handling of:
   * strict type checking: object compat, null ?
-  * ctor injection for complex data types with single value ?object instantiator?
