@@ -188,7 +188,7 @@ class ObjectMapper
      */
     protected function instantiate($typeClass, $json, $properties)
     {
-        $singleValueCtorInstance = function($typeClass, $json) {
+        $singleValueCtorInstance = function ($typeClass, $json) {
             $obj = null;
             if ($rc = $this->getReflectionClass($typeClass)) {
                 $cm = $rc->getConstructor();
@@ -196,7 +196,7 @@ class ObjectMapper
                     if (1 == count($cp) || $cp[1]->isDefaultValueAvailable()) {
                         // single arg ctor
                         $needsPopulate = false;
-                        $arr = (array)$json;
+                        $arr = (array) $json;
                         $obj = new $typeClass(array_pop($arr));
                     }
                 }
@@ -276,14 +276,14 @@ class ObjectMapper
         $typeClass = $this->resolveTypeClass($typeClass, $json);
         $properties = $this->propertyInfoExtractor->getProperties($typeClass);
         $collection = [];
-        foreach ((array)$json as $key => $value) {
+        foreach ((array) $json as $key => $value) {
             list($obj, $needsPopulate) = $this->instantiate($typeClass, $json, $properties);
             $collection[$key] = $needsPopulate ? $this->populate($value, $obj) : $obj;
         }
 
         $collectionClass = $typeReference->getCollectionType();
 
-        return \stdClass::class == $collectionClass ? (object)$collection : new $collectionClass($collection);
+        return \stdClass::class == $collectionClass ? (object) $collection : new $collectionClass($collection);
     }
 
     /**
@@ -304,7 +304,7 @@ class ObjectMapper
         $simpleClass = false;
         if (($obj instanceof \ArrayObject) || \stdClass::class == $class) {
             $simpleClass = true;
-            $properties = array_keys((array)$json);
+            $properties = array_keys((array) $json);
         }
 
         $mappedProperties = [];
