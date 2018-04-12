@@ -175,14 +175,6 @@ class ObjectMapper
      */
     protected function verifyRequiredProperties(string $class, array $properties, array $mappedProperties)
     {
-        if (!$this->docBlockCache) {
-            if ($this->logger) {
-                $this->logger->warning('Skipping required verification - no DocBlockCache configured');
-            }
-
-            return;
-        }
-
         foreach ($properties as $property) {
             if ($docBlock = $this->docBlockCache->getPropertyDocBlock($class, $property)) {
                 if ($docBlock->getTagsByName('required')) {
