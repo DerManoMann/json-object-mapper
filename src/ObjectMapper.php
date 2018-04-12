@@ -195,7 +195,6 @@ class ObjectMapper
                 if ($cm && $cp = $cm->getParameters()) {
                     if (1 == count($cp) || $cp[1]->isDefaultValueAvailable()) {
                         // single arg ctor
-                        $needsPopulate = false;
                         $arr = (array) $json;
                         $obj = new $typeClass(array_pop($arr));
                     }
@@ -214,13 +213,7 @@ class ObjectMapper
             }
         }
 
-        $needsPopulate = false;
-        if (!$obj) {
-            $obj = new $typeClass();
-            $needsPopulate = true;
-        }
-
-        return [$obj, $needsPopulate];
+        return $obj ? [$obj, false] : [new $typeClass(), true];
     }
 
     /**
