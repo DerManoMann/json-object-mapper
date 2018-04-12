@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Radebatz\ObjectMapper\Naming\CamelCase;
 use Radebatz\ObjectMapper\Naming\SnakeCase;
-use Radebatz\ObjectMapper\ObjectMapper;
 
 /**
  */
@@ -36,7 +34,8 @@ class NameMappingTest extends TestCase
      */
     public function testJson($json, $expected)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
+
         $objectMapper->addNamingMapper(new CamelCase());
         $objectMapper->addNamingMapper(new SnakeCase());
 

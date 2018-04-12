@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Radebatz\ObjectMapper\Naming\CamelCase;
 use Radebatz\ObjectMapper\Naming\SnakeCase;
 

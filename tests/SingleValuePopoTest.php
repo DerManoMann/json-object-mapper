@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Radebatz\ObjectMapper\ObjectMapper;
-
 /**
  */
 class SingleValuePopoTest extends TestCase
@@ -24,7 +21,7 @@ class SingleValuePopoTest extends TestCase
     {
         $json = '{"value":"foo"}';
 
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
 
         $popo = $objectMapper->map($json, Models\SingleValuePopo::class);
         $this->assertEquals('foo', $popo->getValue());

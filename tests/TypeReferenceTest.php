@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
@@ -37,7 +36,7 @@ class TypeReferenceTest extends TestCase
      */
     public function testClassType($json)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
 
         $popo1 = $objectMapper->map($json, new ClassTypeReference(Models\SimplePopo::class));
         $this->assertInstanceOf(Models\SimplePopo::class, $popo1);
@@ -50,7 +49,7 @@ class TypeReferenceTest extends TestCase
      */
     public function testObjectType($json)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
 
         $popo1 = $objectMapper->map($json, new ObjectTypeReference(new Models\SimplePopo()));
         $this->assertInstanceOf(Models\SimplePopo::class, $popo1);
@@ -63,7 +62,7 @@ class TypeReferenceTest extends TestCase
      */
     public function testCollectionTypeList($json)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
 
         $json = sprintf('[%s]', $json);
 
@@ -81,7 +80,7 @@ class TypeReferenceTest extends TestCase
      */
     public function testCollectionTypeMap($json)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
 
         $json = sprintf('{"obj":%s}', $json);
 
@@ -99,7 +98,7 @@ class TypeReferenceTest extends TestCase
      */
     public function testCollectionTypeCustomMap($json)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
 
         $json = sprintf('{"obj":%s}', $json);
 

@@ -1,5 +1,4 @@
 * phpdocs
 * caching of things expensive
-* logging
 * handling of:
   * strict type checking: object compat, null ?

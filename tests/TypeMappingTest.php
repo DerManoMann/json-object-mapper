@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\Tests\Models\AnotherPopo;
 use Radebatz\ObjectMapper\Tests\Models\SimplePopo;
 use Radebatz\ObjectMapper\TypeMapperInterface;
@@ -36,7 +34,8 @@ class TypeMappingTest extends TestCase
      */
     public function testJson($json, $mappedTypeClass)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
+
         $objectMapper->addTypeMapper(
             new class() implements TypeMapperInterface {
                 public function resolve($className, $json)

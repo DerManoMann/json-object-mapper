@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Radebatz\ObjectMapper\ObjectMapper;
-
 /**
  */
 class SimplePopoTest extends TestCase
@@ -34,7 +31,7 @@ class SimplePopoTest extends TestCase
      */
     public function testJson($json)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
 
         $popo1 = $objectMapper->map($json, Models\SimplePopo::class);
         $this->assertInstanceOf(Models\SimplePopo::class, $popo1);

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
 
 /**
@@ -38,7 +36,8 @@ class UnmappedPropertiesTest extends TestCase
         $unknownPropertyHandler = function ($obj, $jkey, $jval) use (&$handlerLog) {
             $handlerLog[] = $jkey;
         };
-        $objectMapper = new ObjectMapper([
+
+        $objectMapper = $this->getObjectMapper([
             'ignoreUnknownProperties' => !$fail,
             'unknownPropertyHandler' => $unknownPropertyHandler,
         ]);

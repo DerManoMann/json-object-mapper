@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper;
 
+use Psr\Log\LoggerInterface;
 use Radebatz\ObjectMapper\Naming\DefaultCase;
 use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
@@ -27,6 +28,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class ObjectMapper
 {
     protected $options;
+    /** @var LoggerInterface */
+    protected $logger;
     protected $docBlockCache;
     /** @var PropertyInfoExtractor */
     protected $propertyInfoExtractor;
@@ -38,13 +41,14 @@ class ObjectMapper
 
     /**
      */
-    public function __construct(array $options = [], DocBlockCache $docBlockCache = null, PropertyInfoExtractor $propertyInfoExtractor = null, PropertyAccess $propertyAccess = null)
+    public function __construct(array $options = [], LoggerInterface $logger = null, DocBlockCache $docBlockCache = null, PropertyInfoExtractor $propertyInfoExtractor = null, PropertyAccess $propertyAccess = null)
     {
         $this->options = array_merge($this->getDefaultOptions(), $options);
         if ($this->options['unknownPropertyHandler'] && !is_callable($this->options['unknownPropertyHandler'])) {
             throw new ObjectMapperException('Option "unknownPropertyHandler" must be callable');
         }
 
+        $this->logger = $logger;
         $this->docBlockCache = $docBlockCache ?: new DocBlockCache();
         $this->propertyInfoExtractor = $propertyInfoExtractor ?: $this->getDefaultPropertyInfoExtractor();
         $this->propertyAccessor = $propertyAccess ?: PropertyAccess::createPropertyAccessor();
@@ -152,6 +156,10 @@ class ObjectMapper
      */
     protected function handleUnmappedProperty($obj, $key, $value)
     {
+        if ($this->logger) {
+            $this->logger->debug(sprintf('Handling unmapped property; class=%s, key=%s', get_class($obj), $key));
+        }
+
         if (!$this->options['ignoreUnknownProperties']) {
             throw new ObjectMapperException(sprintf('Unmapped property: %s', $key));
         }
@@ -168,7 +176,10 @@ class ObjectMapper
     protected function verifyRequiredProperties(string $class, array $properties, array $mappedProperties)
     {
         if (!$this->docBlockCache) {
-            // TODO: issue warning
+            if ($this->logger) {
+                $this->logger->warning('Skipping required verification - no DocBlockCache configured');
+            }
+
             return;
         }
 

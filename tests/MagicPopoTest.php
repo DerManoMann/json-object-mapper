@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\PropertyInfo\PhpDocMagicExtractor;
 
@@ -54,7 +52,7 @@ class MagicPopoTest extends TestCase
      */
     public function testJson($json)
     {
-        $objectMapper = new ObjectMapper();
+        $objectMapper = $this->getObjectMapper();
 
         $popo1 = $objectMapper->map($json, Models\MagicPopo::class);
         $this->assertInstanceOf(Models\MagicPopo::class, $popo1);
