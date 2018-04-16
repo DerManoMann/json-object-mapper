@@ -22,6 +22,7 @@ class SimplePopo implements PopoInterface, \JsonSerializable
     private $priString = null;
     protected $proInt = 0;
     protected $proBool = true;
+    protected $proFloats = [];
 
     /**
      */
@@ -81,6 +82,22 @@ class SimplePopo implements PopoInterface, \JsonSerializable
     }
 
     /**
+     * @return float[]
+     */
+    public function getProFloats(): array
+    {
+        return $this->proFloats;
+    }
+
+    /**
+     * @param float[]
+     */
+    public function setProFloats(array $proFloats)
+    {
+        $this->proFloats = $proFloats;
+    }
+
+    /**
      * @inheritdoc
      */
     public function jsonSerialize()
@@ -91,6 +108,7 @@ class SimplePopo implements PopoInterface, \JsonSerializable
             'priString' => $this->priString,
             'proInt' => $this->proInt,
             'proBool' => $this->proBool,
+            'proFloats' => $this->proFloats,
         ];
     }
 }
