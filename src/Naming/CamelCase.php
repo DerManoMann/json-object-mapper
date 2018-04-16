@@ -21,6 +21,14 @@ use Radebatz\ObjectMapper\NamingMapperInterface;
 class CamelCase implements NamingMapperInterface
 {
     protected $cache = [];
+    protected $delimiters;
+
+    /**
+     */
+    public function __construct(array $delimiters = ['_'])
+    {
+        $this->delimiters = $delimiters;
+    }
 
     /**
      * @inheritdoc
@@ -31,7 +39,15 @@ class CamelCase implements NamingMapperInterface
             return $this->cache[$name];
         }
 
-        $words = explode('_', $name);
+        $words = [$name];
+        foreach ($this->delimiters as $delimiter) {
+            $tmp = [];
+            foreach ($words as $word) {
+                $tmp = array_merge($tmp, explode($delimiter, $word));
+            }
+            $words = $tmp;
+        }
+
         $camelKey = lcfirst(implode('', array_map(function ($word) {
             return ucfirst(strtolower($word));
         }, $words)));
