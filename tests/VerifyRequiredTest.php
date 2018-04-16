@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
+use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
 
 /**
@@ -33,7 +34,7 @@ class VerifyRequiredTest extends TestCase
     public function testJson($json, $fail)
     {
         $objectMapper = $this->getObjectMapper([
-            'verifyRequiredProperties' => true,
+            ObjectMapper::OPTION_VERIFY_REQUIRED => true,
         ]);
 
         try {

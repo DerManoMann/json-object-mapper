@@ -17,23 +17,33 @@ use Psr\Log\LoggerInterface;
 use Radebatz\ObjectMapper\Naming\DefaultCase;
 use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
+use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
+use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyInfo\Type as PropertyInfoType;
 
 /**
  */
 class ObjectMapper
 {
+    const OPTION_STRICT_TYPES = 'strictTypes';
+    const OPTION_IGNORE_UNKNOWN = 'ignoreUnknown';
+    const OPTION_VERIFY_REQUIRED = 'verifyRequired';
+    const OPTION_UNKNOWN_PROPRTY_HANDLER = 'unknownPropertyHandler';
+    const OPTION_STRICT_COLLECTIONS = 'strictCollections';
+
     protected $options;
     /** @var LoggerInterface */
     protected $logger;
     protected $docBlockCache;
     /** @var PropertyInfoExtractor */
     protected $propertyInfoExtractor;
-    /** @var PropertyAccess */
+    /** @var PropertyAccessor */
     protected $propertyAccessor;
     protected $typeMappers;
     protected $namingMappers;
@@ -44,7 +54,7 @@ class ObjectMapper
     public function __construct(array $options = [], LoggerInterface $logger = null, DocBlockCache $docBlockCache = null, PropertyInfoExtractor $propertyInfoExtractor = null, PropertyAccess $propertyAccess = null)
     {
         $this->options = array_merge($this->getDefaultOptions(), $options);
-        if ($this->options['unknownPropertyHandler'] && !is_callable($this->options['unknownPropertyHandler'])) {
+        if ($this->options[self::OPTION_UNKNOWN_PROPRTY_HANDLER] && !is_callable($this->options[self::OPTION_UNKNOWN_PROPRTY_HANDLER])) {
             throw new ObjectMapperException('Option "unknownPropertyHandler" must be callable');
         }
 
@@ -86,9 +96,11 @@ class ObjectMapper
     protected function getDefaultOptions()
     {
         return [
-            'ignoreUnknownProperties' => true,
-            'verifyRequiredProperties' => false,
-            'unknownPropertyHandler' => null,
+            self::OPTION_STRICT_COLLECTIONS => true,
+            self::OPTION_STRICT_TYPES => true,
+            self::OPTION_IGNORE_UNKNOWN => true,
+            self::OPTION_VERIFY_REQUIRED => false,
+            self::OPTION_UNKNOWN_PROPRTY_HANDLER => null,
         ];
     }
 
@@ -160,11 +172,11 @@ class ObjectMapper
             $this->logger->debug(sprintf('Handling unmapped property; class=%s, key=%s', get_class($obj), $key));
         }
 
-        if (!$this->options['ignoreUnknownProperties']) {
+        if (!$this->options[self::OPTION_IGNORE_UNKNOWN]) {
             throw new ObjectMapperException(sprintf('Unmapped property: %s', $key));
         }
 
-        if ($this->options['unknownPropertyHandler']) {
+        if ($this->options[self::OPTION_UNKNOWN_PROPRTY_HANDLER]) {
             return call_user_func($this->options['unknownPropertyHandler'], $obj, $key, $value);
         }
 
@@ -292,7 +304,10 @@ class ObjectMapper
     protected function populate($json, $obj, $properties = null)
     {
         if (is_array($json) && !($obj instanceof \ArrayObject)) {
-            throw new ObjectMapperException('Collection type mismatch: expecting object, got array');
+            if ($this->options[self::OPTION_STRICT_COLLECTIONS]) {
+                throw new ObjectMapperException('Collection type mismatch: expecting object, got array');
+            }
+            $json = (object)$json;
         }
 
         $properties = $properties ?: $this->propertyInfoExtractor->getProperties($class = get_class($obj));
@@ -315,16 +330,26 @@ class ObjectMapper
                     if (!$simpleClass && !$this->propertyInfoExtractor->isWritable($class, $key)) {
                         throw new ObjectMapperException(sprintf('Cannot set property value %s', $key));
                     }
+                    /** @var PropertyInfoType $type */
                     if ($type = $this->propertyInfoExtractor->getTypes($class, $key)) {
                         $type = $type[0];
-                        // type checking
+                        if ($this->options[self::OPTION_STRICT_TYPES]) {
+                            // type checking
+                        }
                     }
 
-                    if (is_array($jval)) {
-                        $jval = $this->readInto($jval, new ObjectTypeReference(new \ArrayObject()));
-                    } elseif (is_object($jval)) {
-                        $jvalType = $type ? $type->getClassName() : \stdClass::class;
-                        $jval = $this->readInto($jval, new ClassTypeReference($jvalType));
+                    if (is_array($jval) || is_object($jval)) {
+                        $typeReference = null;
+                        if (!$type || ($type->isCollection() && !$type->getClassName())) {
+                            $typeReference = new ObjectTypeReference(new \ArrayObject());
+                            $jval = $this->readInto($jval, $typeReference)->getArrayCopy();
+                        } elseif (($className = $type->getClassName())) {
+                            if ($type->isCollection()) {
+                                $jval = $this->readInto($jval, new CollectionTypeReference($className));
+                            } else {
+                                $jval = $this->readInto($jval, new ClassTypeReference($className));
+                            }
+                        }
                     }
 
                     if ($simpleClass) {
@@ -334,7 +359,16 @@ class ObjectMapper
                             $obj->$key = $jval;
                         }
                     } else {
-                        $this->propertyAccessor->setValue($obj, $key, $jval);
+                        if ($type && ($buildInType = $type->getBuiltinType())) {
+                            if (null !== $jval) {
+                                settype($jval, $buildInType);
+                            }
+                        }
+                        try {
+                            $this->propertyAccessor->setValue($obj, $key, $jval);
+                        } catch (ExceptionInterface $e) {
+                            throw new ObjectMapperException($e->getMessage(), $e->getCode(), $e);
+                        }
                     }
 
                     $mapped = true;
@@ -349,7 +383,7 @@ class ObjectMapper
             }
         }
 
-        if ($this->options['verifyRequiredProperties']) {
+        if ($this->options[self::OPTION_VERIFY_REQUIRED]) {
             $this->verifyRequiredProperties($class, $properties, $mappedProperties);
         }
 

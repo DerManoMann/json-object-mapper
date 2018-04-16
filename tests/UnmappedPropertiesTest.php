@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
+use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
 
 /**
@@ -38,8 +39,8 @@ class UnmappedPropertiesTest extends TestCase
         };
 
         $objectMapper = $this->getObjectMapper([
-            'ignoreUnknownProperties' => !$fail,
-            'unknownPropertyHandler' => $unknownPropertyHandler,
+            ObjectMapper::OPTION_IGNORE_UNKNOWN => !$fail,
+            ObjectMapper::OPTION_UNKNOWN_PROPRTY_HANDLER => $unknownPropertyHandler,
         ]);
 
         try {
