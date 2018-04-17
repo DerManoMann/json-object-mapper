@@ -169,11 +169,11 @@ class ObjectMapper
     protected function handleUnmappedProperty($obj, $key, $value)
     {
         if ($this->logger) {
-            $this->logger->debug(sprintf('Handling unmapped property; class=%s, key=%s', get_class($obj), $key));
+            $this->logger->debug(sprintf('Handling unmapped property; name=%s, class=%s', $key, get_class($obj)));
         }
 
         if (!$this->options[self::OPTION_IGNORE_UNKNOWN]) {
-            throw new ObjectMapperException(sprintf('Unmapped property: %s', $key));
+            throw new ObjectMapperException(sprintf('Unmapped property; name=%s, class=%s', $key, get_class($obj)));
         }
 
         if ($this->options[self::OPTION_UNKNOWN_PROPRTY_HANDLER]) {
@@ -191,7 +191,7 @@ class ObjectMapper
             if ($docBlock = $this->docBlockCache->getPropertyDocBlock($class, $property)) {
                 if ($docBlock->getTagsByName('required')) {
                     if (!in_array($property, $mappedProperties)) {
-                        throw new ObjectMapperException(sprintf('Missing required property: name=%s, class=%s', $property, $class));
+                        throw new ObjectMapperException(sprintf('Missing required property; name=%s, class=%s', $property, $class));
                     }
                 }
             }
@@ -240,9 +240,13 @@ class ObjectMapper
      */
     public function map($json, $type)
     {
+        if (!$type) {
+            throw new \InvalidArgumentException(sprintf('Type must not be null'));
+        }
+
         $jsonResolved = is_string($json) ? json_decode($json) : $json;
         if (!is_array($jsonResolved) && !is_object($jsonResolved)) {
-            throw new \InvalidArgumentException(sprintf('Expecting json to resolve to either array or object; json=%s, got=%s', $json, $jsonResolved));
+            throw new \InvalidArgumentException(sprintf('Expecting json to resolve to either array or object; json=%s, actual=%s', $json, $jsonResolved));
         }
 
         $typeReference = null;
@@ -307,11 +311,15 @@ class ObjectMapper
             if ($this->options[self::OPTION_STRICT_COLLECTIONS]) {
                 throw new ObjectMapperException('Collection type mismatch: expecting object, got array');
             }
-            $json = (object)$json;
+        }
+
+        if (!is_array($json) && !is_object($json)) {
+            throw new ObjectMapperException(sprintf('Incompatible data type; class=%s, json=%s', get_class($obj), gettype($json)));
         }
 
         $properties = $properties ?: $this->propertyInfoExtractor->getProperties($class = get_class($obj));
 
+        // simple classes do not have accessor support
         $simpleClass = false;
         if (($obj instanceof \ArrayObject) || \stdClass::class == $class) {
             $simpleClass = true;
@@ -319,7 +327,7 @@ class ObjectMapper
         }
 
         $mappedProperties = [];
-        foreach ($json as $jkey => $jval) {
+        foreach ((array) $json as $jkey => $jval) {
             $keys = array_map(function ($namingMapper) use ($jkey) {
                 return $namingMapper->resolve($jkey);
             }, $this->namingMappers);
@@ -328,28 +336,49 @@ class ObjectMapper
             foreach ($keys as $key) {
                 if ($key && in_array($key, $properties)) {
                     if (!$simpleClass && !$this->propertyInfoExtractor->isWritable($class, $key)) {
-                        throw new ObjectMapperException(sprintf('Cannot set property value %s', $key));
+                        // try again
+                        continue;
                     }
+
                     /** @var PropertyInfoType $type */
                     if ($type = $this->propertyInfoExtractor->getTypes($class, $key)) {
                         $type = $type[0];
-                        if ($this->options[self::OPTION_STRICT_TYPES]) {
-                            // type checking
-                        }
                     }
 
-                    if (is_array($jval) || is_object($jval)) {
-                        $typeReference = null;
-                        if (!$type || ($type->isCollection() && !$type->getClassName())) {
-                            $typeReference = new ObjectTypeReference(new \ArrayObject());
-                            $jval = $this->readInto($jval, $typeReference)->getArrayCopy();
-                        } elseif (($className = $type->getClassName())) {
+                    // figure+cast types
+                    if ($type) {
+                        if (!$type->isNullable() && null === $jval) {
+                            throw new ObjectMapperException(sprintf('Unmappable null value; name=%s, class=%s', $key, $class));
+                        }
+
+                        if (null !== $jval) {
+                            $className = $type->getClassName();
                             if ($type->isCollection()) {
-                                $jval = $this->readInto($jval, new CollectionTypeReference($className));
-                            } else {
+                                if (!is_array($jval) && !is_object($jval)) {
+                                    throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, value=%s', $key, $class, gettype($jval)));
+                                }
+
+                                // TODO: deal with collection key/value type
+                                $className = $className ?: \stdClass::class;
+                                $jval = $this->readInto($jval, new CollectionTypeReference($className))->getArrayCopy();
+                            } elseif ($className) {
                                 $jval = $this->readInto($jval, new ClassTypeReference($className));
+                            } elseif ($buildinType = $type->getBuiltinType()) {
+                                $buildinType = 'int' == $buildinType ? 'integer' : $buildinType;
+                                $buildinType = 'bool' == $buildinType ? 'boolean' : $buildinType;
+                                if (null !== $jval) {
+                                    if (false === settype($jval, $buildinType)) {
+                                        throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, value=%s', $key, $class, getType($jval)));
+                                    }
+                                }
                             }
                         }
+                    } elseif (is_array($jval)) {
+                        $typeReference = new ObjectTypeReference(new \ArrayObject());
+                        $jval = $this->readInto($jval, $typeReference)->getArrayCopy();
+                    } elseif (is_object($jval)) {
+                        $typeReference = new ObjectTypeReference(new \stdClass());
+                        $jval = $this->readInto($jval, $typeReference);
                     }
 
                     if ($simpleClass) {
@@ -359,11 +388,6 @@ class ObjectMapper
                             $obj->$key = $jval;
                         }
                     } else {
-                        if ($type && ($buildInType = $type->getBuiltinType())) {
-                            if (null !== $jval) {
-                                settype($jval, $buildInType);
-                            }
-                        }
                         try {
                             $this->propertyAccessor->setValue($obj, $key, $jval);
                         } catch (ExceptionInterface $e) {

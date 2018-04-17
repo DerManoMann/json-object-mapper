@@ -27,6 +27,10 @@ class SnakeCase implements NamingMapperInterface
      */
     public function resolve($name)
     {
+        if (null === $name) {
+            return null;
+        }
+
         if (array_key_exists($name, $this->cache)) {
             return $this->cache[$name];
         }

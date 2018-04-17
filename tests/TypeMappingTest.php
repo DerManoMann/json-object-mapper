@@ -56,6 +56,7 @@ class TypeMappingTest extends TestCase
         $popo1 = $objectMapper->map($json, Models\NestedPopo::class);
         $this->assertInstanceOf($mappedTypeClass, $popo1->getProInter());
         $this->assertInstanceOf(Models\NestedPopo::class, $popo1);
+
         $popo2 = $objectMapper->map(json_encode($popo1), Models\NestedPopo::class);
         $this->assertEquals($popo1, $popo2);
     }
