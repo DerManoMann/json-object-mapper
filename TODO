@@ -1,6 +1,3 @@
 * phpdocs
-* caching of things expensive
-* handling of:
-  * strict type checking: object compat, null ?
 * convert ObjectMapper::populate into interface and allow custom implementations
 * convert ObjectMapper::instantiate into interface and allow custom implementations

@@ -36,6 +36,7 @@ class ObjectMapper
     const OPTION_VERIFY_REQUIRED = 'verifyRequired';
     const OPTION_UNKNOWN_PROPRTY_HANDLER = 'unknownPropertyHandler';
     const OPTION_STRICT_COLLECTIONS = 'strictCollections';
+    const OPTION_INSTANTIATE_REQUIRE_CTOR = 'instantiateRequireCtor';
 
     protected $options;
     /** @var LoggerInterface */
@@ -101,6 +102,7 @@ class ObjectMapper
             self::OPTION_IGNORE_UNKNOWN => true,
             self::OPTION_VERIFY_REQUIRED => false,
             self::OPTION_UNKNOWN_PROPRTY_HANDLER => null,
+            self::OPTION_INSTANTIATE_REQUIRE_CTOR => true,
         ];
     }
 
@@ -208,7 +210,7 @@ class ObjectMapper
             if ($rc = $this->getReflectionClass($typeClass)) {
                 $cm = $rc->getConstructor();
                 if ($cm && $cp = $cm->getParameters()) {
-                    if (1 == count($cp) || $cp[1]->isDefaultValueAvailable()) {
+                    if (1 == count($cp) || $cp[0]->isDefaultValueAvailable()) {
                         // single arg ctor
                         $arr = (array) $json;
                         $obj = new $typeClass(array_pop($arr));
@@ -228,7 +230,21 @@ class ObjectMapper
             }
         }
 
-        return $obj ? [$obj, false] : [new $typeClass(), true];
+        $needsPopulate = null === $obj;
+
+        if (!$obj) {
+            try {
+                $obj = new $typeClass();
+            } catch (\ArgumentCountError $e) {
+                if ($this->options[self::OPTION_INSTANTIATE_REQUIRE_CTOR]) {
+                    throw new ObjectMapperException(sprintf('Unable to instantiate value object; class=%s', $typeClass), $e->getCode(), $e);
+                }
+
+                $obj = ($rc = $this->getReflectionClass($typeClass))->newInstanceWithoutConstructor();
+            }
+        }
+
+        return [$obj, $needsPopulate];
     }
 
     /**

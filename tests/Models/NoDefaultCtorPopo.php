@@ -15,20 +15,35 @@ namespace Radebatz\ObjectMapper\Tests\Models;
 
 /**
  */
-class SingleValuePopo implements \JsonSerializable
+class NoDefaultCtorPopo implements \JsonSerializable
 {
-    protected $value;
+    protected $value = null;
+    protected $other = true;
 
-    public function __construct(?string $value = null)
+    public function __construct(string $value)
     {
         $this->value = $value;
     }
 
     /**
      */
-    public function getValue():?string
+    public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     */
+    public function isOther(): bool
+    {
+        return $this->other;
+    }
+
+    /**
+     */
+    public function setOther(bool $other)
+    {
+        $this->other = $other;
     }
 
     /**
@@ -38,6 +53,7 @@ class SingleValuePopo implements \JsonSerializable
     {
         return [
             'value' => $this->value,
+            'other' => $this->other,
         ];
     }
 }
