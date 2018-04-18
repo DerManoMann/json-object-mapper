@@ -1,0 +1,14 @@
+<phpunit backupGlobals="false"
+         bootstrap="tests/jsonmapper.php"
+         colors="true"
+         beStrictAboutChangesToGlobalState="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestSize="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">vendor/netresearch/jsonmapper/src</directory>
+        </whitelist>
+    </filter>
+</phpunit>
