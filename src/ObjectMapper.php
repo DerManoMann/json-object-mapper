@@ -125,20 +125,20 @@ class ObjectMapper
         $reflectionExtractor = new ReflectionExtractor();
 
         $listExtractors = [
-            $reflectionExtractor
+            $reflectionExtractor,
         ];
 
         $typeExtractors = [
             $phpDocExtractor,
-            $reflectionExtractor
+            $reflectionExtractor,
         ];
 
         $descriptionExtractors = [
-            $phpDocExtractor
+            $phpDocExtractor,
         ];
 
         $accessExtractors = [
-            $reflectionExtractor
+            $reflectionExtractor,
         ];
 
         return new PropertyInfoExtractor(
@@ -375,7 +375,7 @@ class ObjectMapper
                                 }
 
                                 // TODO: deal with collection key/value type
-                                $className = $className ?: \stdClass::class;
+                                $className = $type->getCollectionValueType() ?:  \stdClass::class;
                                 $jval = $this->readInto($jval, new CollectionTypeReference($className))->getArrayCopy();
                             } elseif ($className) {
                                 $jval = $this->readInto($jval, new ClassTypeReference($className));

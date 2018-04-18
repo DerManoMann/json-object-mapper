@@ -20,10 +20,11 @@ class NestedPopoTest extends TestCase
     public function json()
     {
         return [
-//            ['{"proString":"pro"}'],
-//            ['{"proString":"pro", "proSimple":{"proString":"yup","proBool":false}}'],
-            ['{"proString":"pro", "proArrObj":{"proString":"yup","proBool":false}}'],
-//            ['{"proString":"pro", "proStdC":{"proString":"yup","proBool":false}}'],
+            'plain' => ['{"proString":"pro"}'],
+            'simple' => ['{"proString":"pro", "proSimple":{"proString":"yup","proBool":false}}'],
+            'array-object' => ['{"proString":"pro", "proArrObj":{"proString":"yup","proBool":false}}'],
+            'interface' => ['{"proString":"pro", "proStdC":{"proString":"yup","proBool":false}}'],
+            'typed-array' => ['{"proString":"pro", "proSimpleArr":[{"proString":"yup","proBool":false}]}'],
         ];
     }
 
