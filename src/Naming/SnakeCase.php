@@ -27,7 +27,7 @@ class SnakeCase implements NamingMapperInterface
      */
     public function resolve($name)
     {
-        if (null === $name) {
+        if (null === $name || is_numeric($name)) {
             return null;
         }
 

@@ -21,7 +21,7 @@ class NoDefaultCtorPopoTest extends TestCase
 {
     /**
      * @expectedException \Radebatz\ObjectMapper\ObjectMapperException
-     * @expectedExceptionMessage Unable to instantiate value object; class=Radebatz\ObjectMapper\Tests\Models\NoDefaultCtorPopo
+     * @expectedExceptionMessage Unable to instantiate value object; class=\Radebatz\ObjectMapper\Tests\Models\NoDefaultCtorPopo
      */
     public function testCtorValueFail()
     {

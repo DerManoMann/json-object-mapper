@@ -95,16 +95,17 @@ class NestedPopo implements \JsonSerializable
     }
 
     /**
+     * @return SimplePopo[]
      */
-    public function getProSimpleArr()
+    public function getProSimpleArr(): array
     {
         return $this->proSimpleArr;
     }
 
     /**
-     * @param SimplePopo []
+     * @param SimplePopo[]
      */
-    public function setProSimpleArr($proSimpleArr)
+    public function setProSimpleArr(array $proSimpleArr)
     {
         $this->proSimpleArr = $proSimpleArr;
     }
@@ -120,6 +121,7 @@ class NestedPopo implements \JsonSerializable
             'proInter' => $this->proInter,
             'proArrObj' => $this->proArrObj,
             'proStdC' => $this->proStdC,
+            'proSimpleArr' => $this->proSimpleArr,
         ];
     }
 }

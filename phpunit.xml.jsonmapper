@@ -1,5 +1,5 @@
 <phpunit backupGlobals="false"
-         bootstrap="tests/jsonmapper.php"
+         bootstrap="tests/JsonMapper/bootstrap.php"
          colors="true"
          beStrictAboutChangesToGlobalState="true"
          beStrictAboutOutputDuringTests="true"

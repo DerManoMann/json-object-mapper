@@ -1,10 +1,5 @@
 <?php
 
-set_include_path(
-    __DIR__ . '/../vendor/netresearch/jsonmapper/src/'
-    . PATH_SEPARATOR . get_include_path()
-);
-
 use Radebatz\ObjectMapper\Naming\CamelCase;
 use Radebatz\ObjectMapper\Naming\SnakeCase;
 use Radebatz\ObjectMapper\ObjectMapper;
@@ -50,6 +45,8 @@ class JsonMapper
         => 'JSON property "pArrayObject" must be an array, double given',
         'Incompatible data type; name=flArray, class=JsonMapperTest_Array, value=integer'
         => 'JSON property "flArray" must be an array, integer given',
+        'Unable to instantiate value object; class=\JsonMapperTest_ValueObject'
+        => 'JSON property "pValueObject" must be an object, string given',
     ];
 
     public function setLogger($logger)
@@ -70,12 +67,21 @@ class JsonMapper
 
     protected function getObjectMapper()
     {
+        $unknownPropertyHandler = null;
+        if ($this->undefinedPropertyHandler) {
+            $undefinedPropertyHandler = $this->undefinedPropertyHandler;
+            $unknownPropertyHandler = function ($obj, $jkey, $jval) use ($undefinedPropertyHandler) {
+                call_user_func($undefinedPropertyHandler, $obj, $jkey, $jval);
+            };
+        }
+
         $objectMapper = new ObjectMapper([
             ObjectMapper::OPTION_IGNORE_UNKNOWN => !$this->bExceptionOnUndefinedProperty,
             ObjectMapper::OPTION_VERIFY_REQUIRED => $this->bExceptionOnMissingData,
             ObjectMapper::OPTION_UNKNOWN_PROPRTY_HANDLER => null,
             ObjectMapper::OPTION_STRICT_TYPES => false,
             ObjectMapper::OPTION_STRICT_COLLECTIONS => $this->bEnforceMapType,
+            ObjectMapper::OPTION_UNKNOWN_PROPRTY_HANDLER => $unknownPropertyHandler,
         ]);
 
         $objectMapper->addNamingMapper(new CamelCase(['_', '-']));

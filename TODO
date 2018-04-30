@@ -1,5 +1,5 @@
 * phpdocs
 * convert ObjectMapper::populate into interface and allow custom implementations
 * convert ObjectMapper::instantiate into interface and allow custom implementations
-* array typehint for typed array conflict with the more precise phpdoc (ie MyClass[])
 * failing tests in JsonMapper decorator
+* fully flesh out magic method phpdoc support (partially implemented)
