@@ -6,6 +6,11 @@
          beStrictAboutTestSize="true"
          beStrictAboutTestsThatDoNotTestAnything="true"
 >
+    <testsuites>
+        <testsuite name="Object Mapper Test Suite">
+            <directory>vendor/netresearch/jsonmapper/tests</directory>
+        </testsuite>
+    </testsuites>
     <filter>
         <whitelist>
             <directory suffix=".php">vendor/netresearch/jsonmapper/src</directory>
