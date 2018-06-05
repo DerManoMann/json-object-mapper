@@ -30,3 +30,13 @@ $myData = $objectMapper->map($json, \MyData::class);
 
 echo $myData->getFoo(); // echo's 'bar'
 ````
+
+## Testing
+This package is inspired by the excellent [jsonmapper](https://github.com/cweiske/jsonmapper) package.
+In order to evaluate its features the tests folder contains an adapter that lets you run the ````jsonmapper```` test suite agaist the ````json-object-manager```` codebase.
+
+For this you run:
+
+````
+./vendor/bin/phpunit -c phpunit.xml.jsonmapper
+```` 
