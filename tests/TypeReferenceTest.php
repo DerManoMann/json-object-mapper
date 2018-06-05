@@ -28,6 +28,7 @@ class TypeReferenceTest extends TestCase
             ['{"pubString":"pub","proString":"pro","priString":"pri"}'],
             ['{"pubString":null,"proString":null}'],
             ['{"proInt":1,"proBool":false}'],
+            ['{"proFloats":[1.0,2.1]}'],
         ];
     }
 
@@ -66,12 +67,12 @@ class TypeReferenceTest extends TestCase
 
         $json = sprintf('[%s]', $json);
 
-        $popo1 = $objectMapper->map($json, new CollectionTypeReference(Models\SimplePopo::class));
+        $popo1 = $objectMapper->map($json, new CollectionTypeReference(new ClassTypeReference(Models\SimplePopo::class)));
 
         $this->assertInstanceOf(\ArrayObject::class, $popo1);
         $this->assertEquals(1, count($popo1));
 
-        $popo2 = $objectMapper->map(json_encode($popo1), new CollectionTypeReference(Models\SimplePopo::class));
+        $popo2 = $objectMapper->map(json_encode($popo1), new CollectionTypeReference(new ClassTypeReference(Models\SimplePopo::class)));
         $this->assertEquals($popo1, $popo2);
     }
 
@@ -84,12 +85,12 @@ class TypeReferenceTest extends TestCase
 
         $json = sprintf('{"obj":%s}', $json);
 
-        $popo1 = $objectMapper->map($json, new CollectionTypeReference(Models\SimplePopo::class));
+        $popo1 = $objectMapper->map($json, new CollectionTypeReference(new ClassTypeReference(Models\SimplePopo::class)));
 
         $this->assertInstanceOf(\ArrayObject::class, $popo1);
         $this->assertEquals(1, count($popo1));
 
-        $popo2 = $objectMapper->map(json_encode($popo1), new CollectionTypeReference(Models\SimplePopo::class));
+        $popo2 = $objectMapper->map(json_encode($popo1), new CollectionTypeReference(new ClassTypeReference(Models\SimplePopo::class)));
         $this->assertEquals($popo1, $popo2);
     }
 
@@ -102,12 +103,12 @@ class TypeReferenceTest extends TestCase
 
         $json = sprintf('{"obj":%s}', $json);
 
-        $popo1 = $objectMapper->map($json, new CollectionTypeReference(Models\SimplePopo::class, \stdClass::class));
+        $popo1 = $objectMapper->map($json, new CollectionTypeReference(new ClassTypeReference(Models\SimplePopo::class), \stdClass::class));
 
         $this->assertInstanceOf(\stdClass::class, $popo1);
         $this->assertEquals(1, count((array) $popo1));
 
-        $popo2 = $objectMapper->map(json_encode($popo1), new CollectionTypeReference(Models\SimplePopo::class, \stdClass::class));
+        $popo2 = $objectMapper->map(json_encode($popo1), new CollectionTypeReference(new ClassTypeReference(Models\SimplePopo::class), \stdClass::class));
         $this->assertEquals($popo1, $popo2);
     }
 }

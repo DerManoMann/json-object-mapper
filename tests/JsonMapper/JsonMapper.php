@@ -47,11 +47,21 @@ class JsonMapper
         => 'JSON property "flArray" must be an array, integer given',
         'Unable to instantiate value object; class=\JsonMapperTest_ValueObject'
         => 'JSON property "pValueObject" must be an object, string given',
+        'Incompatible data type; name=pValueObject, class=JsonMapperTest_Object, type=string, expected=object'
+        => 'JSON property "pValueObject" must be an object, string given',
     ];
 
     public function setLogger($logger)
     {
         //$this->logger = $logger;
+    }
+
+    public function createInstance($class, $useParameter, $parameter) {
+        if ($useParameter) {
+            return new $class($parameter);
+        } else {
+            return (new \ReflectionClass($class))->newInstanceWithoutConstructor();
+        }
     }
 
     protected function getJsonMapperException($e, $class = JsonMapper_Exception::class)
@@ -79,7 +89,7 @@ class JsonMapper
             ObjectMapper::OPTION_IGNORE_UNKNOWN => !$this->bExceptionOnUndefinedProperty,
             ObjectMapper::OPTION_VERIFY_REQUIRED => $this->bExceptionOnMissingData,
             ObjectMapper::OPTION_UNKNOWN_PROPRTY_HANDLER => null,
-            ObjectMapper::OPTION_STRICT_TYPES => false,
+            ObjectMapper::OPTION_STRICT_TYPES => $this->bStrictObjectTypeChecking,
             ObjectMapper::OPTION_STRICT_COLLECTIONS => $this->bEnforceMapType,
             ObjectMapper::OPTION_UNKNOWN_PROPRTY_HANDLER => $unknownPropertyHandler,
         ]);

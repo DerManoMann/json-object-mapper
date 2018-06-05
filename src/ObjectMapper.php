@@ -281,6 +281,24 @@ class ObjectMapper
     }
 
     /**
+     * Assert assigning build in type values
+     */
+    protected function assertAssignBuildIn($value, $type, $key = null, $class = null)
+    {
+        if (null !== $value && $type) {
+            $compatibleType = $this->getCompatible(gettype($value), $type);
+            if ($this->options[self::OPTION_STRICT_TYPES] && !$compatibleType) {
+                throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=%s', $key, $class, gettype($value), $compatibleType));
+            }
+            if (false === settype($value, $compatibleType ?: $type)) {
+                throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s', $key, $class, gettype($value)));
+            }
+        }
+
+        return $value;
+    }
+
+    /**
      * Map Json to (nested) object(s).
      *
      * @param array|object|string $json The JSON data
@@ -324,22 +342,29 @@ class ObjectMapper
         if ($typeReference instanceof ObjectTypeReference) {
             return $this->populate($json, $typeReference->getObject());
         } elseif (ClassTypeReference::class === get_class($typeReference)) {
-            $typeClass = $typeReference->getClassName();
-            $typeClass = $this->resolveTypeClass($typeClass, $json);
-            $properties = $this->propertyInfoExtractor->getProperties($typeClass);
-            list($obj, $needsPopulate) = $this->instantiate($typeClass, $json, $properties);
+            $valueType = $typeReference->getClassName();
+            $valueType = $this->resolveTypeClass($valueType, $json);
+            $properties = $this->propertyInfoExtractor->getProperties($valueType);
+            list($obj, $needsPopulate) = $this->instantiate($valueType, $json, $properties);
 
             return $needsPopulate ? $this->populate($json, $obj) : $obj;
         }
 
         // collection
-        $typeClass = $typeReference->getClassName();
-        $typeClass = $this->resolveTypeClass($typeClass, $json);
-        $properties = $this->propertyInfoExtractor->getProperties($typeClass);
+        $valueType = $typeReference->getValueType();
+        $valueTypeClass = null;
+        if ($valueType instanceof ClassTypeReference) {
+            $valueTypeClass = $this->resolveTypeClass($valueType->getClassName(), $json);
+        }
+        $properties = $this->propertyInfoExtractor->getProperties($valueType);
         $collection = [];
         foreach ((array)$json as $key => $value) {
-            list($obj, $needsPopulate) = $this->instantiate($typeClass, $value, $properties);
-            $collection[$key] = $needsPopulate ? $this->populate($value, $obj) : $obj;
+            if ($valueTypeClass) {
+                list($obj, $needsPopulate) = $this->instantiate($valueTypeClass, $value, $properties);
+                $collection[$key] = $needsPopulate ? $this->populate($value, $obj) : $obj;
+            } else {
+                $collection[$key] = $this->assertAssignBuildIn($value, $valueType, $key);
+            }
         }
 
         $collectionClass = $typeReference->getCollectionType();
@@ -406,28 +431,30 @@ class ObjectMapper
                                     throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, value=%s', $key, $class, gettype($jval)));
                                 }
 
-                                $className = \stdClass::class;
+                                $collectionValueType = null;
                                 if ($valueType = $type->getCollectionValueType()) {
                                     if ($buildinType = $valueType->getBuiltinType()) {
                                         if ('object' == $buildinType) {
-                                            $className = $valueType->getClassName();
+                                            if ($valueType->getClassName()) {
+                                                $collectionValueType = new ClassTypeReference($valueType->getClassName());
+                                            } else {
+                                                $collectionValueType = \stdClass::class;
+                                            }
+                                        } else {
+                                            $collectionValueType = $buildinType;
                                         }
                                     }
                                 }
 
-                                $jval = $this->readInto($jval, new CollectionTypeReference($className))->getArrayCopy();
+                                $jval = $this->readInto($jval, new CollectionTypeReference($collectionValueType))->getArrayCopy();
                             } elseif ($className = $type->getClassName()) {
+                                if ($this->options[self::OPTION_STRICT_TYPES] && !is_object($jval)) {
+                                    throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=%s', $key, $class, gettype($jval), 'object'));
+                                }
+
                                 $jval = $this->readInto($jval, new ClassTypeReference($className));
                             } elseif ($buildinType = $type->getBuiltinType()) {
-                                if (null !== $jval) {
-                                    $compatibleType = $this->getCompatible(gettype($jval), $buildinType);
-                                    if ($this->options[self::OPTION_STRICT_TYPES] && !$compatibleType) {
-                                        throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=%s', $key, $class, gettype($jval), $compatibleType));
-                                    }
-                                    if (false === settype($jval, $compatibleType ?: $buildinType)) {
-                                        throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s', $key, $class, gettype($jval)));
-                                    }
-                                }
+                                $jval = $this->assertAssignBuildIn($jval, $buildinType, $key, $class);
                             }
                         }
                     } elseif (is_array($jval)) {

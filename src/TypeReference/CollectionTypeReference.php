@@ -13,23 +13,40 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\TypeReference;
 
+use Radebatz\ObjectMapper\TypeReferenceInterface;
+
 /**
  * Type reference to map data into a list/map with custom collection type classes allowed.
  *
  * Custom collection types are expected to have a constructor that accepts the collection data.
  * Only exception to that is `\stdClass`.
  */
-class CollectionTypeReference extends ClassTypeReference
+class CollectionTypeReference implements TypeReferenceInterface
 {
+    protected $valueType;
     protected $collectionType;
 
     /**
+     * @param string|ClassTypeReference
      */
-    public function __construct(string $className, string $collectionType = \ArrayObject::class)
+    public function __construct($valueType, string $collectionType = \ArrayObject::class)
     {
-        parent::__construct($className);
-
+        $this->valueType = $valueType;
         $this->collectionType = $collectionType;
+    }
+
+    /**
+     */
+    public function getValueType()
+    {
+        return $this->valueType;
+    }
+
+    /**
+     */
+    public function setValueType($valueType)
+    {
+        $this->valueType = $valueType;
     }
 
     /**
