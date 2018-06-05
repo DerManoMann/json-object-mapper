@@ -1,5 +1,5 @@
 * phpdocs
 * convert ObjectMapper::populate into interface and allow custom implementations
 * convert ObjectMapper::instantiate into interface and allow custom implementations
-* failing tests in JsonMapper decorator
+* failing tests in JsonMapper wrapper
 * fully flesh out magic method phpdoc support (partially implemented)
