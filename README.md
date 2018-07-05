@@ -40,5 +40,6 @@ In order to evaluate its features the tests folder contains an adapter that lets
 For this you run:
 
 ````
+rm -rf vendor/netresearch/jsonmapper && composer install --prefer-source
 ./vendor/bin/phpunit -c phpunit.xml.jsonmapper
 ```` 
