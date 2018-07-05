@@ -3,6 +3,8 @@ A simple library to deserialize JSON into (nested) PHP  arrays / objects.
 
 [![Build Status](https://travis-ci.org/DerManoMann/json-object-mapper.png)](https://travis-ci.org/DerManoMann/json-object-mapper)
 
+## Currently depends on [this patch](https://github.com/symfony/symfony/pull/27837)
+
 ## Examples
 ````
 class MyClass 
