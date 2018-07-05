@@ -40,7 +40,7 @@ class UnmappedPropertiesTest extends TestCase
 
         $objectMapper = $this->getObjectMapper([
             ObjectMapper::OPTION_IGNORE_UNKNOWN => !$fail,
-            ObjectMapper::OPTION_UNKNOWN_PROPRTY_HANDLER => $unknownPropertyHandler,
+            ObjectMapper::OPTION_UNKNOWN_PROPERTY_HANDLER  => $unknownPropertyHandler,
         ]);
 
         try {

@@ -40,7 +40,7 @@ class NestedPopo implements \JsonSerializable
 
     /**
      */
-    public function getProSimple():?SimplePopo
+    public function getProSimple(): ?SimplePopo
     {
         return $this->proSimple;
     }
@@ -54,7 +54,7 @@ class NestedPopo implements \JsonSerializable
 
     /**
      */
-    public function getProInter():?PopoInterface
+    public function getProInter(): ?PopoInterface
     {
         return $this->proInter;
     }
@@ -68,7 +68,7 @@ class NestedPopo implements \JsonSerializable
 
     /**
      */
-    public function getProArrObj():?\ArrayObject
+    public function getProArrObj(): ?\ArrayObject
     {
         return $this->proArrObj;
     }
@@ -82,7 +82,7 @@ class NestedPopo implements \JsonSerializable
 
     /**
      */
-    public function getProStdC():?\stdClass
+    public function getProStdC(): ?\stdClass
     {
         return $this->proStdC;
     }

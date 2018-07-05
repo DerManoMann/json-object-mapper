@@ -23,12 +23,12 @@ class DataTypeTest extends TestCase
     public function json()
     {
         return [
-//            ['{"proString":false}', true, true],
-//            ['{"proInt":1,"proBool":false}', true, false],
-//            ['{"proInt":"abc"}', true, true],
+            ['{"proString":false}', true, true],
+            ['{"proInt":1,"proBool":false}', true, false],
+            ['{"proInt":"abc"}', true, true],
             ['{"proString":false}', false, false],
-//            ['{"proInt":1,"proBool":false}', false, false],
-//            ['{"proInt":"abc"}', false, false],
+            ['{"proInt":1,"proBool":false}', false, false],
+            ['{"proInt":"abc"}', false, false],
         ];
     }
 

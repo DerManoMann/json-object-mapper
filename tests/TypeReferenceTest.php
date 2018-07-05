@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
@@ -25,10 +24,10 @@ class TypeReferenceTest extends TestCase
     public function json()
     {
         return [
-            ['{"pubString":"pub","proString":"pro","priString":"pri"}'],
-            ['{"pubString":null,"proString":null}'],
-            ['{"proInt":1,"proBool":false}'],
-            ['{"proFloats":[1.0,2.1]}'],
+            'strings' => ['{"pubString":"pub","proString":"pro","priString":"pri"}'],
+            'null' => ['{"pubString":null,"proString":null}'],
+            'other' => ['{"proInt":1,"proBool":false}'],
+            'floats' => ['{"proFloats":[1.0,2.1]}'],
         ];
     }
 

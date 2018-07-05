@@ -24,6 +24,7 @@ use Radebatz\ObjectMapper\ObjectMapper;
 class TestCase extends BaseTestCase
 {
     /**
+     * @throws \Exception
      */
     protected function getLogger(): LoggerInterface
     {
@@ -31,8 +32,9 @@ class TestCase extends BaseTestCase
     }
 
     /**
+     * @throws \Exception
      */
-    protected function getObjectMapper(array $options = []): ObjectMapper
+    protected function getObjectMapper(array $options = [])//: ObjectMapper
     {
         return new ObjectMapper($options, $this->getLogger());
     }
