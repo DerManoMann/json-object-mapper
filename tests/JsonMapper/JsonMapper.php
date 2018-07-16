@@ -190,7 +190,7 @@ class JsonMapper
     public function mapArray($json, $array, $class = null)
     {
         try {
-            return $this->getObjectMapper()->map($json, ($class ? new CollectionTypeReference($class) : new ObjectTypeReference(new \ArrayObject())))->getArrayCopy();
+            return $this->getObjectMapper()->map((object)$json, ($class ? new CollectionTypeReference($class) : new ObjectTypeReference(new \ArrayObject())))->getArrayCopy();
         } catch (ObjectMapperException $e) {
             throw $this->getJsonMapperException($e);
         } catch (\InvalidArgumentException $e) {
