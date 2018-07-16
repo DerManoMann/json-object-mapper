@@ -348,7 +348,7 @@ class ObjectMapper
 
         $jsonResolved = is_string($json) ? json_decode($json) : $json;
         if (!is_array($jsonResolved) && !is_object($jsonResolved)) {
-            throw new ObjectMapperException(sprintf('Expecting json to resolve to either array or object; json=%s, actual=%s', $json, $jsonResolved));
+            throw new \InvalidArgumentException(sprintf('Expecting JSON to resolve to either array or object; json=%s, actual=%s', $json, $jsonResolved));
         }
 
         $typeReference = null;

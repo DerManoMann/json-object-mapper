@@ -49,6 +49,12 @@ class JsonMapper
         => 'JSON property "pValueObject" must be an object, string given',
         'Incompatible data type; name=pValueObject, class=JsonMapperTest_Object, type=string, expected=object'
         => 'JSON property "pValueObject" must be an object, string given',
+        'Could not determine access type for property "privatePropertyPrivateSetter" in class "PrivateWithSetter": Neither the property "privatePropertyPrivateSetter" nor one of the methods "addPrivatePropertyPrivateSetter()"/"removePrivatePropertyPrivateSetter()", "setPrivatePropertyPrivateSetter()", "privatePropertyPrivateSetter()", "__set()" or "__call()" exist and have public access in class "PrivateWithSetter"..'
+        => 'JSON property "privatePropertyPrivateSetter" has no public setter method in object of type PrivateWithSetter',
+        'Expecting JSON to resolve to either array or object; json=, actual='
+        => 'JsonMapper::map() requires first argument to be an object, NULL given.',
+        'Collection type mismatch: expecting object, got double'
+        => 'JSON property "pArrayObject" must be an array, double given',
     ];
     private $logMap = [
         'Unwritable property; name=protectedStrNoSetter, class=JsonMapperTest_Simple' =>
@@ -79,6 +85,10 @@ class JsonMapper
 
         if (array_key_exists($message, $this->exceptionMap)) {
             $message = $this->exceptionMap[$message];
+//        } else {
+//            echo '==============='.PHP_EOL;
+//            echo $message.PHP_EOL;
+//            echo '==============='.PHP_EOL;
         }
 
         return new $class($message);
