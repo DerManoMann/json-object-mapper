@@ -285,10 +285,17 @@ class ObjectMapper
                 $cm = $rc->getConstructor();
                 if ($cm && ($cp = $cm->getParameters())) {
                     // reflection bug DateTime?
-                    if (1 == count($cp) || $cp[0]->isDefaultValueAvailable() || '\\DateTime' == $valueClassName) {
+                    if (1 == count($cp) || '\\DateTime' == $valueClassName) {
                         // single arg ctor
                         $arr = (array)$json;
-                        $obj = new $valueClassName(array_pop($arr));
+                        $arg = array_pop($arr);
+                        try {
+                            if (!($cpType = $cp[0]->getType()) || $this->nativeType($arg, (string) $cpType, $valueClassName)) {
+                                $obj = new $valueClassName($arg);
+                            }
+                        } catch (ObjectMapperException $ome) {
+                            // ignore
+                        }
                     }
                 }
             }
@@ -356,7 +363,7 @@ class ObjectMapper
                 $typeReference = new ObjectTypeReference($type);
             }
         } else {
-            $typeReference = new ClassTypeReference($type);
+            $typeReference = new ClassTypeReference($this->resolveTypeClass($type, $json));
         }
 
         return $this->mapType($jsonResolved, $typeReference);
