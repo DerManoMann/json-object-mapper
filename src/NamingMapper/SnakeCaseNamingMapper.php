@@ -11,14 +11,12 @@ declare(strict_types=1);
 * file that was distributed with this source code.
 */
 
-namespace Radebatz\ObjectMapper\Naming;
-
-use Radebatz\ObjectMapper\NamingMapperInterface;
+namespace Radebatz\ObjectMapper\NamingMapper;
 
 /**
- * Resolve property names to snake case.
+ * Map property names to snake case.
  */
-class SnakeCase implements NamingMapperInterface
+class SnakeCaseNamingMapper implements NamingMapperInterface
 {
     protected $cache = [];
 

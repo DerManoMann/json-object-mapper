@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\TypeReference;
 
-use Radebatz\ObjectMapper\TypeReferenceInterface;
-
 /**
  * Type reference to map data into a list/map with custom collection type classes allowed.
  *

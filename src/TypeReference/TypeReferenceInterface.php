@@ -11,7 +11,7 @@ declare(strict_types=1);
 * file that was distributed with this source code.
 */
 
-namespace Radebatz\ObjectMapper;
+namespace Radebatz\ObjectMapper\TypeReference;
 
 /**
  * Allows to define more complex data types for the value object.

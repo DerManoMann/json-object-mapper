@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use Radebatz\ObjectMapper\Naming\CamelCase;
-use Radebatz\ObjectMapper\Naming\SnakeCase;
+use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
+use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
 
 /**
  */
-class NamingTest extends TestCase
+class NamingMapperTest extends TestCase
 {
     public function snakeNames()
     {
@@ -40,7 +40,7 @@ class NamingTest extends TestCase
      */
     public function testSnakeCase($from, $snake)
     {
-        $namingMapper = new SnakeCase();
+        $namingMapper = new SnakeCaseNamingMapper();
         $this->assertEquals(($snake === $from ? null : $snake), $namingMapper->resolve($from));
     }
 
@@ -63,7 +63,7 @@ class NamingTest extends TestCase
      */
     public function testCamelCase($from, $camel)
     {
-        $namingMapper = new CamelCase();
+        $namingMapper = new CamelCaseNamingMapper();
         $this->assertEquals(($camel === $from ? null : $camel), $namingMapper->resolve($from));
     }
 }

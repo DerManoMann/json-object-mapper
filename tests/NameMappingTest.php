@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use Radebatz\ObjectMapper\Naming\CamelCase;
-use Radebatz\ObjectMapper\Naming\SnakeCase;
+use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
+use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
 
 /**
  */
@@ -36,8 +36,8 @@ class NameMappingTest extends TestCase
     {
         $objectMapper = $this->getObjectMapper();
 
-        $objectMapper->addNamingMapper(new CamelCase());
-        $objectMapper->addNamingMapper(new SnakeCase());
+        $objectMapper->addNamingMapper(new CamelCaseNamingMapper());
+        $objectMapper->addNamingMapper(new SnakeCaseNamingMapper());
 
         /** @var Models\SimplePopo  */
         $popo = $objectMapper->map($json, Models\SimplePopo::class);

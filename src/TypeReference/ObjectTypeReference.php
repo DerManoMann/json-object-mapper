@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\TypeReference;
 
-use Radebatz\ObjectMapper\TypeReferenceInterface;
-
 /**
  * Type reference to map into an existing value object.
  */

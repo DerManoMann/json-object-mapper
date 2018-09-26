@@ -11,14 +11,12 @@ declare(strict_types=1);
 * file that was distributed with this source code.
 */
 
-namespace Radebatz\ObjectMapper\Naming;
-
-use Radebatz\ObjectMapper\NamingMapperInterface;
+namespace Radebatz\ObjectMapper\NamingMapper;
 
 /**
- * Resolve property names to camel case.
+ * Map property names to camel case.
  */
-class CamelCase implements NamingMapperInterface
+class CamelCaseNamingMapper implements NamingMapperInterface
 {
     protected $cache = [];
     protected $delimiters;

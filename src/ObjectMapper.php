@@ -14,11 +14,14 @@ declare(strict_types=1);
 namespace Radebatz\ObjectMapper;
 
 use Psr\Log\LoggerInterface;
-use Radebatz\ObjectMapper\Naming\DefaultCase;
+use Radebatz\ObjectMapper\NamingMapper\NamingMapperInterface;
+use Radebatz\ObjectMapper\NamingMapper\NoopNamingMapper;
 use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
+use Radebatz\ObjectMapper\TypeMapper\TypeMapperInterface;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
+use Radebatz\ObjectMapper\TypeReference\TypeReferenceInterface;
 use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -68,9 +71,17 @@ class ObjectMapper
         $this->propertyAccessor = $propertyAccess ?: PropertyAccess::createPropertyAccessor();
         $this->typeMappers = [];
         $this->namingMappers = [
-            new DefaultCase(),
+            new NoopNamingMapper(),
         ];
         $this->reflectionClasses = [];
+    }
+
+    /**
+     * Set type mappers.
+     */
+    public function setTypeMappers(array $typeMappers): void
+    {
+        $this->typeMappers = $typeMappers;
     }
 
     /**
@@ -79,6 +90,14 @@ class ObjectMapper
     public function addTypeMapper(TypeMapperInterface $typeMapper): void
     {
         $this->typeMappers[] = $typeMapper;
+    }
+
+    /**
+     * Set naming mappers.
+     */
+    public function setNamingMappers(array $namingMappers): void
+    {
+        $this->namingMappers = $namingMappers;
     }
 
     /**
@@ -172,7 +191,6 @@ class ObjectMapper
                 return $mappedTypeClass;
             }
         }
-
 
         return $className;
     }
@@ -287,7 +305,7 @@ class ObjectMapper
                     // reflection bug DateTime?
                     if (1 == count($cp) || '\\DateTime' == $valueClassName) {
                         // single arg ctor
-                        $arr = (array)$json;
+                        $arr = (array) $json;
                         $arg = array_pop($arr);
                         try {
                             if (!($cpType = $cp[0]->getType()) || $this->nativeType($arg, (string) $cpType, $valueClassName)) {
@@ -312,9 +330,9 @@ class ObjectMapper
         $valueClassName = '\\' . ltrim($valueClassName, '\\');
 
         $obj = null;
-        if (1 == count((array)$json)) {
+        if (1 == count((array) $json)) {
             $obj = $singleValueCtorInstance($valueClassName, $json);
-        } elseif (1 == count($properties = (array)$this->propertyInfoExtractor->getProperties($valueClassName)) && 1 == count((array)$json)) {
+        } elseif (1 == count($properties = (array) $this->propertyInfoExtractor->getProperties($valueClassName)) && 1 == count((array) $json)) {
             if (!$this->propertyInfoExtractor->isWritable($valueClassName, $properties[0])) {
                 $obj = $singleValueCtorInstance($valueClassName, $json);
             }
@@ -392,7 +410,7 @@ class ObjectMapper
 
             // collections always start this way :)
             $collection = [];
-            foreach ((array)$json as $jsonKey => $jsonValue) {
+            foreach ((array) $json as $jsonKey => $jsonValue) {
                 // TODO: is $jsonValue a collection?
                 if ($valueClassName) {
                     // resolve actual type based on $jsonValue
@@ -404,7 +422,7 @@ class ObjectMapper
 
             $collectionClassName = $typeReference->getCollectionType();
 
-            return \stdClass::class == $collectionClassName ? (object)$collection : new $collectionClassName($collection);
+            return \stdClass::class == $collectionClassName ? (object) $collection : new $collectionClassName($collection);
         }
 
         throw new ObjectMapperException(sprintf('Unsupported type reference: %s', get_class($typeReference)));
@@ -428,12 +446,12 @@ class ObjectMapper
         // no property info/access support
         $passThrough = ($obj instanceof \ArrayObject) || ($obj instanceof \stdClass);
 
-        $properties = $passThrough ? array_keys((array)$json) : (array)$this->propertyInfoExtractor->getProperties($className);
+        $properties = $passThrough ? array_keys((array) $json) : (array) $this->propertyInfoExtractor->getProperties($className);
 
         // keep track of properties processed in case we want to verify required ones later
         $mappedProperties = [];
 
-        foreach ((array)$json as $jkey => $jval) {
+        foreach ((array) $json as $jkey => $jval) {
             // allow naming mappers to do their thing
             $keys = array_map(function (NamingMapperInterface $namingMapper) use ($jkey) {
                 return $namingMapper->resolve($jkey);

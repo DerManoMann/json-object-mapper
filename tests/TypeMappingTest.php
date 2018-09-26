@@ -17,7 +17,7 @@ use Radebatz\ObjectMapper\Tests\Models\AnotherPopo;
 use Radebatz\ObjectMapper\Tests\Models\NestedPopo;
 use Radebatz\ObjectMapper\Tests\Models\PopoInterface;
 use Radebatz\ObjectMapper\Tests\Models\SimplePopo;
-use Radebatz\ObjectMapper\TypeMapperInterface;
+use Radebatz\ObjectMapper\TypeMapper\TypeMapperInterface;
 
 /**
  */
@@ -40,7 +40,7 @@ class TypeMappingTest extends TestCase
 
         $objectMapper->addTypeMapper(
             new class() implements TypeMapperInterface {
-                public function resolve($className, $json)
+                public function resolve($className, $json): ?string
                 {
                     if (is_object($json) && PopoInterface::class == $className) {
                         if (property_exists($json, 'foo')) {

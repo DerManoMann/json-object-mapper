@@ -11,16 +11,18 @@ declare(strict_types=1);
 * file that was distributed with this source code.
 */
 
-namespace Radebatz\ObjectMapper;
+namespace Radebatz\ObjectMapper\NamingMapper;
 
 /**
- * Type mapper/resolver interface for any type that cannot be instantiated.
+ * No-op naming mapper - this is the default.
  */
-interface NamingMapperInterface
+class NoopNamingMapper implements NamingMapperInterface
 {
     /**
-     * @param string $name The property name
-     * @return string|null An alternative name
+     * @inheritdoc
      */
-    public function resolve($name);
+    public function resolve($name)
+    {
+        return $name;
+    }
 }

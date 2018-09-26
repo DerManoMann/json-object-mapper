@@ -1,10 +1,10 @@
 <?php
 
-use Radebatz\ObjectMapper\Naming\CamelCase;
-use Radebatz\ObjectMapper\Naming\SnakeCase;
+use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
+use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
-use Radebatz\ObjectMapper\TypeMapperInterface;
+use Radebatz\ObjectMapper\TypeMapper\TypeMapperInterface;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 
@@ -109,8 +109,7 @@ class JsonMapper
             $jmLogger = $this->jmLogger;
             $logMap = $this->logMap;
 
-            $logger = new class($jmLogger, $logMap) extends \Monolog\Logger
-            {
+            $logger = new class($jmLogger, $logMap) extends \Monolog\Logger {
                 protected $jmLogger;
                 protected $logMap;
 
@@ -121,7 +120,7 @@ class JsonMapper
                     $this->logMap = $logMap;
                 }
 
-                public function addRecord($level, $message, array $context = array())
+                public function addRecord($level, $message, array $context = [])
                 {
                     if (array_key_exists($message, $this->logMap)) {
                         $mapped = $this->logMap[$message];
@@ -143,17 +142,16 @@ class JsonMapper
             ObjectMapper::OPTION_UNKNOWN_PROPERTY_HANDLER => $unknownPropertyHandler,
         ], $logger);
 
-        $objectMapper->addNamingMapper(new CamelCase(['_', '-']));
-        $objectMapper->addNamingMapper(new SnakeCase());
+        $objectMapper->addNamingMapper(new CamelCaseNamingMapper(['_', '-']));
+        $objectMapper->addNamingMapper(new SnakeCaseNamingMapper());
 
         foreach ($this->classMap as $class => $mapped) {
-            $mapper = new class() implements TypeMapperInterface
-            {
+            $mapper = new class() implements TypeMapperInterface {
                 public $class;
                 public $mapped = null;
                 public $resolver = null;
 
-                public function resolve($className, $json)
+                public function resolve($className, $json): ?string
                 {
                     if ($this->mapped) {
                         return $this->mapped;
@@ -190,7 +188,7 @@ class JsonMapper
     public function mapArray($json, $array, $class = null)
     {
         try {
-            return $this->getObjectMapper()->map((object)$json, ($class ? new CollectionTypeReference($class) : new ObjectTypeReference(new \ArrayObject())))->getArrayCopy();
+            return $this->getObjectMapper()->map((object) $json, ($class ? new CollectionTypeReference($class) : new ObjectTypeReference(new \ArrayObject())))->getArrayCopy();
         } catch (ObjectMapperException $e) {
             throw $this->getJsonMapperException($e);
         } catch (\InvalidArgumentException $e) {
