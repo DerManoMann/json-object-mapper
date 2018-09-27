@@ -303,7 +303,7 @@ class ObjectMapper
                 $cm = $rc->getConstructor();
                 if ($cm && ($cp = $cm->getParameters())) {
                     // reflection bug DateTime?
-                    if (1 == count($cp) || '\\DateTime' == $valueClassName) {
+                    if (1 == count($cp) && (!$cp[0]->isDefaultValueAvailable() || null === $cp[0]->getDefaultValue() || '\\DateTime' == $valueClassName)) {
                         // single arg ctor
                         $arr = (array) $json;
                         $arg = array_pop($arr);
