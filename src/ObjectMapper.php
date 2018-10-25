@@ -463,10 +463,12 @@ class ObjectMapper
                 // find property in object
                 if (null !== $key && in_array($key, $properties)) {
                     if (!$passThrough && !$this->propertyInfoExtractor->isWritable($className, $key)) {
-                        $this->logger->debug(
-                            sprintf('Unwritable property; name=%s, class=%s', $key, $className),
-                            ['property' => $key, 'class' => $className]
-                        );
+                        if ($this->logger) {
+                            $this->logger->debug(
+                                sprintf('Unwritable property; name=%s, class=%s', $key, $className),
+                                ['property' => $key, 'class' => $className]
+                            );
+                        }
                         continue;
                     }
 
