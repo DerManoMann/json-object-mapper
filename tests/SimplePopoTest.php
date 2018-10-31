@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-/**
- */
 class SimplePopoTest extends TestCase
 {
     public function json()

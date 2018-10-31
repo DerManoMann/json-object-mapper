@@ -19,8 +19,6 @@ use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 
-/**
- */
 class DocBlockCache
 {
     protected $docBlockFactory;
@@ -33,8 +31,8 @@ class DocBlockCache
 
     /**
      * @param DocBlockFactoryInterface $docBlockFactory
-     * @param string[]|null $mutatorPrefixes
-     * @param string[]|null $accessorPrefixes
+     * @param string[]|null            $mutatorPrefixes
+     * @param string[]|null            $accessorPrefixes
      */
     public function __construct(DocBlockFactoryInterface $docBlockFactory = null, array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
     {
@@ -49,29 +47,21 @@ class DocBlockCache
         $this->contextFactory = new ContextFactory();
     }
 
-    /**
-     */
     public function getMutatorPrefixes()
     {
         return $this->mutatorPrefixes;
     }
 
-    /**
-     */
     public function getAccessorPrefixes()
     {
         return $this->accessorPrefixes;
     }
 
-    /**
-     */
     public function getArrayMutatorPrefixes(): array
     {
         return $this->arrayMutatorPrefixes;
     }
 
-    /**
-     */
     public function getClassDocBlock(string $class): ?DocBlock
     {
         if (array_key_exists($class, $this->docBlocks)) {
@@ -90,8 +80,6 @@ class DocBlockCache
         return $this->docBlocks[$class] = $docBlock;
     }
 
-    /**
-     */
     public function getPropertyDocBlock(string $class, string $property): ?DocBlock
     {
         $docBlockHash = sprintf('%s::%s', $class, $property);

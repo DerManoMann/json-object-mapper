@@ -19,8 +19,9 @@ namespace Radebatz\ObjectMapper\TypeMapper;
 interface TypeMapperInterface
 {
     /**
-     * @param string $className The class/interface name to map
-     * @param array|object $json The data to deserialize
+     * @param string       $className The class/interface name to map
+     * @param array|object $json      The data to deserialize
+     *
      * @return string|null A instantiable class name
      */
     public function resolve($className, $json): ?string;

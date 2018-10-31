@@ -16,8 +16,6 @@ namespace Radebatz\ObjectMapper\Tests;
 use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
 use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
 
-/**
- */
 class NamingMapperTest extends TestCase
 {
     public function snakeNames()

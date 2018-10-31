@@ -16,8 +16,6 @@ namespace Radebatz\ObjectMapper\Tests;
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
 
-/**
- */
 class UnmappedPropertiesTest extends TestCase
 {
     public function json()

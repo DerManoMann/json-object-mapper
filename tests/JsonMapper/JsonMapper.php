@@ -55,6 +55,8 @@ class JsonMapper
         => 'JsonMapper::map() requires first argument to be an object, NULL given.',
         'Collection type mismatch: expecting object, got double'
         => 'JSON property "pArrayObject" must be an array, double given',
+        'Passed variable is not an array or object'
+        => 'JSON property "pArrayObject" must be an array, double given',
     ];
     private $logMap = [
         'Unwritable property; name=protectedStrNoSetter, class=JsonMapperTest_Simple' =>
@@ -85,10 +87,13 @@ class JsonMapper
 
         if (array_key_exists($message, $this->exceptionMap)) {
             $message = $this->exceptionMap[$message];
-//        } else {
-//            echo '==============='.PHP_EOL;
-//            echo $message.PHP_EOL;
-//            echo '==============='.PHP_EOL;
+        }
+
+        $forceJsonMapperException = [
+            'JSON property "pArrayObject" must be an array, double given',
+        ];
+        if (in_array($message, $forceJsonMapperException)) {
+            $class = JsonMapper_Exception::class;
         }
 
         return new $class($message);
@@ -140,6 +145,8 @@ class JsonMapper
             ObjectMapper::OPTION_STRICT_TYPES => $this->bStrictObjectTypeChecking,
             ObjectMapper::OPTION_STRICT_COLLECTIONS => $this->bEnforceMapType,
             ObjectMapper::OPTION_UNKNOWN_PROPERTY_HANDLER => $unknownPropertyHandler,
+            ObjectMapper::OPTION_INSTANTIATE_REQUIRE_CTOR => false,
+            ObjectMapper::OPTION_STRICT_NULL => $this->bStrictNullTypes,
         ], $logger);
 
         $objectMapper->addNamingMapper(new CamelCaseNamingMapper(['_', '-']));

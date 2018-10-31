@@ -17,8 +17,6 @@ use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 
-/**
- */
 class TypeReferenceTest extends TestCase
 {
     public function json()

@@ -21,8 +21,6 @@ class CamelCaseNamingMapper implements NamingMapperInterface
     protected $cache = [];
     protected $delimiters;
 
-    /**
-     */
     public function __construct(array $delimiters = ['_'])
     {
         $this->delimiters = $delimiters;

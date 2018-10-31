@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-/**
- */
 class NestedPopoTest extends TestCase
 {
     public function json()
@@ -39,18 +37,18 @@ class NestedPopoTest extends TestCase
         $popo1 = $objectMapper->map($json, Models\NestedPopo::class);
         $this->assertInstanceOf(Models\NestedPopo::class, $popo1);
         if (null !== ($proSimple = $popo1->getProSimple())) {
-            /** @var Models\SimplePopo $proSimple */
+            /* @var Models\SimplePopo $proSimple */
             $this->assertInstanceOf(Models\SimplePopo::class, $proSimple);
             $this->assertEquals('yup', $proSimple->getProString());
         }
         if (null !== ($proArrObj = $popo1->getProArrObj())) {
-            /** @var \ArrayObject $proArrObj */
+            /* @var \ArrayObject $proArrObj */
             $this->assertInstanceOf(\ArrayObject::class, $proArrObj);
             $this->assertTrue($proArrObj->offsetExists('proString'));
             $this->assertEquals('yup', $proArrObj['proString']);
         }
         if (null !== ($proStdC = $popo1->getProStdC())) {
-            /** @var \stdClass $proStdC */
+            /* @var \stdClass $proStdC */
             $this->assertEquals(\stdClass::class, get_class($proStdC));
             $this->assertTrue(property_exists($proStdC, 'proString'));
             $this->assertEquals('yup', $proStdC->proString);

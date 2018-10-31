@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper;
 
-/**
- */
 class ObjectMapperException extends \RuntimeException
 {
 }

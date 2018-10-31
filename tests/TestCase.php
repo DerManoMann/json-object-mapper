@@ -19,8 +19,6 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Log\LoggerInterface;
 use Radebatz\ObjectMapper\ObjectMapper;
 
-/**
- */
 class TestCase extends BaseTestCase
 {
     /**
@@ -34,7 +32,7 @@ class TestCase extends BaseTestCase
     /**
      * @throws \Exception
      */
-    protected function getObjectMapper(array $options = [])//: ObjectMapper
+    protected function getObjectMapper(array $options = []): ObjectMapper
     {
         return new ObjectMapper($options, $this->getLogger());
     }

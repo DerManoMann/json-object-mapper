@@ -16,8 +16,6 @@ namespace Radebatz\ObjectMapper\Tests;
 use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\PropertyInfo\PhpDocMagicExtractor;
 
-/**
- */
 class MagicPopoTest extends TestCase
 {
     /**

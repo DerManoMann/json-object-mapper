@@ -13,21 +13,15 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests\Models;
 
-/**
- */
 class AnotherPopo implements PopoInterface, \JsonSerializable
 {
     protected $foo;
 
-    /**
-     */
     public function getFoo()
     {
         return $this->foo;
     }
 
-    /**
-     */
     public function setFoo($foo)
     {
         $this->foo = $foo;

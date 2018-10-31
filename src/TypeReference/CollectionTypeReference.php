@@ -24,8 +24,8 @@ class CollectionTypeReference implements TypeReferenceInterface
     protected $collectionType;
 
     /**
-     * @param string|ClassTypeReference $valueType String values are taken as build in data type
-     * @param string $collectionType
+     * @param string|ClassTypeReference $valueType      String values are taken as build in data type
+     * @param string                    $collectionType
      */
     public function __construct($valueType = null, $collectionType = null)
     {
@@ -33,29 +33,21 @@ class CollectionTypeReference implements TypeReferenceInterface
         $this->setCollectionType($collectionType);
     }
 
-    /**
-     */
     public function getValueType()
     {
         return $this->valueType;
     }
 
-    /**
-     */
     public function setValueType($valueType)
     {
         $this->valueType = $valueType;
     }
 
-    /**
-     */
     public function getCollectionType()
     {
         return $this->collectionType;
     }
 
-    /**
-     */
     public function setCollectionType($collectionType)
     {
         $this->collectionType = $collectionType ?: \ArrayObject::class;

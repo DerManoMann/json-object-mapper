@@ -19,12 +19,12 @@ use Radebatz\ObjectMapper\Tests\Models\PopoInterface;
 use Radebatz\ObjectMapper\Tests\Models\SimplePopo;
 use Radebatz\ObjectMapper\TypeMapper\TypeMapperInterface;
 
-/**
- */
 class TypeMappingTest extends TestCase
 {
     public function json()
     {
+        $date = new \DateTime();
+
         return [
             ['{"proInter":{"foo":"bar"}}', AnotherPopo::class],
             ['{"proInter":{"proString":"bar"}}', SimplePopo::class],

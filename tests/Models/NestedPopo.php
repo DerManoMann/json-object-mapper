@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests\Models;
 
-/**
- */
 class NestedPopo implements \JsonSerializable
 {
     protected $proString = null;
@@ -24,71 +22,51 @@ class NestedPopo implements \JsonSerializable
     protected $proStdC = null;
     protected $proSimpleArr = [];
 
-    /**
-     */
     public function getProString(): ?string
     {
         return $this->proString;
     }
 
-    /**
-     */
     public function setProString(?string $proString)
     {
         $this->proString = $proString;
     }
 
-    /**
-     */
     public function getProSimple(): ?SimplePopo
     {
         return $this->proSimple;
     }
 
-    /**
-     */
     public function setProSimple(?SimplePopo $proSimple)
     {
         $this->proSimple = $proSimple;
     }
 
-    /**
-     */
     public function getProInter(): ?PopoInterface
     {
         return $this->proInter;
     }
 
-    /**
-     */
     public function setProInter(?PopoInterface $proInter)
     {
         $this->proInter = $proInter;
     }
 
-    /**
-     */
     public function getProArrObj(): ?\ArrayObject
     {
         return $this->proArrObj;
     }
 
-    /**
-     */
     public function setProArrObj(?\ArrayObject $proArrObj)
     {
         $this->proArrObj = $proArrObj;
     }
 
-    /**
-     */
     public function getProStdC(): ?\stdClass
     {
         return $this->proStdC;
     }
 
-    /**
-     */
     public function setProStdC(?\stdClass $proStdC)
     {
         $this->proStdC = $proStdC;

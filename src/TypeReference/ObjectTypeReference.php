@@ -20,22 +20,16 @@ class ObjectTypeReference implements TypeReferenceInterface
 {
     protected $obj;
 
-    /**
-     */
     public function __construct($obj)
     {
         $this->obj = $obj;
     }
 
-    /**
-     */
     public function getObject()
     {
         return $this->obj;
     }
 
-    /**
-     */
     public function setObject($obj)
     {
         $this->obj = $obj;

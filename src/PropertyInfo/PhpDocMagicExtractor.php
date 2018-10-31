@@ -22,8 +22,6 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
-/**
- */
 class PhpDocMagicExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface
 {
     protected $dockBlockCache;
@@ -119,8 +117,6 @@ class PhpDocMagicExtractor implements PropertyListExtractorInterface, PropertyTy
         return $type ? [$type] : null;
     }
 
-    /**
-     */
     protected function getPropertyName(string $methodName): ?string
     {
         $pattern = implode('|', array_merge($this->dockBlockCache->getAccessorPrefixes(), $this->dockBlockCache->getMutatorPrefixes()));

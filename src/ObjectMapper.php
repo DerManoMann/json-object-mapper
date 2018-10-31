@@ -29,16 +29,15 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-/**
- */
 class ObjectMapper
 {
     const OPTION_STRICT_TYPES = 'strictTypes';
+    const OPTION_STRICT_COLLECTIONS = 'strictCollections';
+    const OPTION_STRICT_NULL = 'strictNull';
     const OPTION_IGNORE_UNKNOWN = 'ignoreUnknown';
     const OPTION_VERIFY_REQUIRED = 'verifyRequired';
-    const OPTION_UNKNOWN_PROPERTY_HANDLER = 'unknownPropertyHandler';
-    const OPTION_STRICT_COLLECTIONS = 'strictCollections';
     const OPTION_INSTANTIATE_REQUIRE_CTOR = 'instantiateRequireCtor';
+    const OPTION_UNKNOWN_PROPERTY_HANDLER = 'unknownPropertyHandler';
 
     protected $options;
     /** @var LoggerInterface */
@@ -56,8 +55,6 @@ class ObjectMapper
     /** @var array */
     protected $reflectionClasses;
 
-    /**
-     */
     public function __construct(array $options = [], LoggerInterface $logger = null, DocBlockCache $docBlockCache = null, PropertyInfoExtractor $propertyInfoExtractor = null, PropertyAccess $propertyAccess = null)
     {
         $this->options = array_merge($this->getDefaultOptions(), $options);
@@ -123,12 +120,13 @@ class ObjectMapper
     protected function getDefaultOptions(): array
     {
         return [
-            self::OPTION_STRICT_COLLECTIONS => true,
             self::OPTION_STRICT_TYPES => true,
+            self::OPTION_STRICT_COLLECTIONS => true,
+            self::OPTION_STRICT_NULL => true,
             self::OPTION_IGNORE_UNKNOWN => true,
             self::OPTION_VERIFY_REQUIRED => false,
-            self::OPTION_UNKNOWN_PROPERTY_HANDLER => null,
             self::OPTION_INSTANTIATE_REQUIRE_CTOR => true,
+            self::OPTION_UNKNOWN_PROPERTY_HANDLER => null,
         ];
     }
 
@@ -239,8 +237,9 @@ class ObjectMapper
     /**
      * Get a compatible native data type.
      *
-     * @param string $type The actual data type
+     * @param string $type     The actual data type
      * @param string $expected The expected type
+     *
      * @return string|null The compatible type usable for settype()
      */
     protected function getCompatibleType(string $type, string $expected): ?string
@@ -297,21 +296,20 @@ class ObjectMapper
      */
     protected function instantiate($json, string $valueClassName)
     {
-        $singleValueCtorInstance = function ($valueClassName, $json) {
+        $singleValueCtorInstance = function ($valueClassName, $value) {
             $obj = null;
             if ($rc = $this->getReflectionClass($valueClassName)) {
                 $cm = $rc->getConstructor();
-                if ($cm && ($cp = $cm->getParameters())) {
-                    if (1 == count($cp) && (!$cp[0]->isDefaultValueAvailable() || null === $cp[0]->getDefaultValue())) {
-                        // single arg ctor
-                        $arr = (array) $json;
-                        $arg = array_pop($arr);
+                if ($cm && ($cp = $cm->getParameters()) && (!is_array($value) && !is_object($value))) {
+                    if (!$cp[0]->isDefaultValueAvailable() || null === $cp[0]->getDefaultValue()) {
                         try {
-                            if (!($cpType = $cp[0]->getType()) || $this->nativeType($arg, (string) $cpType, $valueClassName)) {
-                                $obj = new $valueClassName($arg);
+                            if (!($cpType = $cp[0]->getType()) || $this->nativeType($value, (string) $cpType, $valueClassName)) {
+                                $obj = new $valueClassName($value);
                             }
                         } catch (ObjectMapperException $ome) {
-                            // ignore
+                            // ignore incompatible types
+                        } catch (\InvalidArgumentException $e) {
+                            // ignore incompatible types
                         }
                     }
                 }
@@ -321,16 +319,20 @@ class ObjectMapper
         };
 
         if (null === $json) {
-            // null instance
-            return [null, false];
+            return null;
+        }
+
+        // deal with case of actual class instances
+        if (is_object($json) && get_class($json) == $valueClassName) {
+            return $json;
         }
 
         // FQDN
         $valueClassName = '\\' . ltrim($valueClassName, '\\');
 
         $obj = null;
-        if (1 == count((array) $json)) {
-            $obj = $singleValueCtorInstance($valueClassName, $json);
+        if (1 == count($arr = (array) $json) && !is_object($json)) {
+            $obj = $singleValueCtorInstance($valueClassName, array_pop($arr));
         } elseif (1 == count($properties = (array) $this->propertyInfoExtractor->getProperties($valueClassName)) && 1 == count((array) $json)) {
             if (!$this->propertyInfoExtractor->isWritable($valueClassName, $properties[0])) {
                 $obj = $singleValueCtorInstance($valueClassName, $json);
@@ -357,8 +359,9 @@ class ObjectMapper
     /**
      * Map JSON into (nested) object(s).
      *
-     * @param array|object|string $json The JSON data
+     * @param array|object|string                  $json The JSON data
      * @param string|object|TypeReferenceInterface $type The target type / object
+     *
      * @return mixed The value object
      */
     public function map($json, $type)
@@ -389,8 +392,9 @@ class ObjectMapper
     /**
      * Map JSON into (nested) object(s).
      *
-     * @param array|object $json The JSON data
+     * @param array|object           $json          The JSON data
      * @param TypeReferenceInterface $typeReference
+     *
      * @return mixed The value object
      */
     protected function mapType($json, TypeReferenceInterface $typeReference)
@@ -431,12 +435,13 @@ class ObjectMapper
      * The work horse - mapping object JSON data onto the actual (nested) value object.
      *
      * @param object $json The JSON data
-     * @param object $obj The value object to populate
+     * @param object $obj  The value object to populate
+     *
      * @return mixed The value object
      */
     protected function populate($json, $obj)
     {
-        if (!is_object($json) && $this->options[self::OPTION_STRICT_COLLECTIONS]) {
+        if (!is_object($json) && !($obj instanceof \ArrayObject) && $this->options[self::OPTION_STRICT_COLLECTIONS]) {
             throw new ObjectMapperException(sprintf('Collection type mismatch: expecting object, got %s', gettype($json)));
         }
 
@@ -478,7 +483,7 @@ class ObjectMapper
                         $type = $types[0];
 
                         // got type info from annotation or type hints
-                        if (!$type->isNullable() && null === $jval) {
+                        if (!$type->isNullable() && null === $jval && $this->options[self::OPTION_STRICT_NULL]) {
                             throw new ObjectMapperException(sprintf('Unmappable null value; name=%s, class=%s', $key, $className));
                         }
 

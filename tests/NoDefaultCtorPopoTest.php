@@ -15,8 +15,6 @@ namespace Radebatz\ObjectMapper\Tests;
 
 use Radebatz\ObjectMapper\ObjectMapper;
 
-/**
- */
 class NoDefaultCtorPopoTest extends TestCase
 {
     /**

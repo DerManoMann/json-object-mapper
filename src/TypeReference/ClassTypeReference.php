@@ -14,28 +14,22 @@ declare(strict_types=1);
 namespace Radebatz\ObjectMapper\TypeReference;
 
 /**
- * Type reference to map into a new instance of `$className`
+ * Type reference to map into a new instance of `$className`.
  */
 class ClassTypeReference implements TypeReferenceInterface
 {
     protected $className;
 
-    /**
-     */
     public function __construct(string $className)
     {
         $this->className = $className;
     }
 
-    /**
-     */
     public function getClassName(): string
     {
         return $this->className;
     }
 
-    /**
-     */
     public function setClassName(string $className)
     {
         $this->className = $className;

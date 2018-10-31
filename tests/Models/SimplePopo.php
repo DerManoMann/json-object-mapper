@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests\Models;
 
-/**
- */
 class SimplePopo implements PopoInterface, \JsonSerializable
 {
     public $pubString = null;
@@ -23,37 +21,28 @@ class SimplePopo implements PopoInterface, \JsonSerializable
     protected $proInt = 0;
     protected $proBool = true;
     protected $proFloats = [];
+    protected $date = null;
 
-    /**
-     */
     public function getProString(): ?string
     {
         return $this->proString;
     }
 
-    /**
-     */
     public function setProString(?string $proString): void
     {
         $this->proString = $proString;
     }
 
-    /**
-     */
     public function getPriString(): ?string
     {
         return $this->priString;
     }
 
-    /**
-     */
     public function setPriString(?string $priString): void
     {
         $this->priString = $priString;
     }
 
-    /**
-     */
     public function getProInt(): int
     {
         return $this->proInt;
@@ -67,15 +56,11 @@ class SimplePopo implements PopoInterface, \JsonSerializable
         $this->proInt = $proInt;
     }
 
-    /**
-     */
     public function isProBool(): bool
     {
         return $this->proBool;
     }
 
-    /**
-     */
     public function setProBool(bool $proBool): void
     {
         $this->proBool = $proBool;
@@ -97,6 +82,16 @@ class SimplePopo implements PopoInterface, \JsonSerializable
         $this->proFloats = $proFloats;
     }
 
+    public function getDate(): ?\DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(?\DateTime $date): void
+    {
+        $this->date = $date;
+    }
+
     /**
      * @inheritdoc
      */
@@ -109,6 +104,7 @@ class SimplePopo implements PopoInterface, \JsonSerializable
             'proInt' => $this->proInt,
             'proBool' => $this->proBool,
             'proFloats' => $this->proFloats,
+            'date' => $this->date ? $this->date->format(\DateTime::ISO8601) : null,
         ];
     }
 }

@@ -20,6 +20,7 @@ interface NamingMapperInterface
 {
     /**
      * @param string $name The property name
+     *
      * @return string|null An alternative name
      */
     public function resolve($name);
