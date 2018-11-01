@@ -327,6 +327,11 @@ class ObjectMapper
             return $json;
         }
 
+        $isArrayObject = \ArrayObject::class == $valueClassName || is_subclass_of($valueClassName, \ArrayObject::class);
+        if (!is_object($json) && !is_array($json) && $isArrayObject && $this->options[self::OPTION_STRICT_COLLECTIONS]) {
+            throw new ObjectMapperException(sprintf('Collection type mismatch: expecting object or array, got %s', gettype($json)));
+        }
+
         // FQDN
         $valueClassName = '\\' . ltrim($valueClassName, '\\');
 

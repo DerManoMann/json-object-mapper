@@ -57,6 +57,8 @@ class JsonMapper
         => 'JSON property "pArrayObject" must be an array, double given',
         'Passed variable is not an array or object'
         => 'JSON property "pArrayObject" must be an array, double given',
+        'Collection type mismatch: expecting object or array, got double'
+        => 'JSON property "pArrayObject" must be an array, double given'
     ];
     private $logMap = [
         'Unwritable property; name=protectedStrNoSetter, class=JsonMapperTest_Simple' =>
