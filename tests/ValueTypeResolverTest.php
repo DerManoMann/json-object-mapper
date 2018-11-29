@@ -18,8 +18,9 @@ use Radebatz\ObjectMapper\Tests\Models\NestedPopo;
 use Radebatz\ObjectMapper\Tests\Models\PopoInterface;
 use Radebatz\ObjectMapper\Tests\Models\SimplePopo;
 use Radebatz\ObjectMapper\TypeMapper\TypeMapperInterface;
+use Radebatz\ObjectMapper\ValueTypeResolverInterface;
 
-class TypeMappingTest extends TestCase
+class ValueTypeResolverTest extends TestCase
 {
     public function json()
     {
@@ -38,8 +39,8 @@ class TypeMappingTest extends TestCase
     {
         $objectMapper = $this->getObjectMapper();
 
-        $objectMapper->addTypeMapper(
-            new class() implements TypeMapperInterface {
+        $objectMapper->addValueTypeResolver(
+            new class() implements ValueTypeResolverInterface {
                 public function resolve($className, $json): ?string
                 {
                     if (is_object($json) && PopoInterface::class == $className) {

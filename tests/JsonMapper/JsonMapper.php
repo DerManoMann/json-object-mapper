@@ -4,9 +4,9 @@ use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
 use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
-use Radebatz\ObjectMapper\TypeMapper\TypeMapperInterface;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
+use Radebatz\ObjectMapper\ValueTypeResolverInterface;
 
 class JsonMapper
 {
@@ -155,7 +155,7 @@ class JsonMapper
         $objectMapper->addNamingMapper(new SnakeCaseNamingMapper());
 
         foreach ($this->classMap as $class => $mapped) {
-            $mapper = new class() implements TypeMapperInterface {
+            $valueTypeResolver = new class() implements ValueTypeResolverInterface {
                 public $class;
                 public $mapped = null;
                 public $resolver = null;
@@ -174,10 +174,10 @@ class JsonMapper
                 }
             };
 
-            $mapper->class = $class;
-            $mapper->mapped = is_callable($mapped) ? null : $mapped;
-            $mapper->resolver = is_callable($mapped) ? $mapped : null;
-            $objectMapper->addTypeMapper($mapper);
+            $valueTypeResolver->class = $class;
+            $valueTypeResolver->mapped = is_callable($mapped) ? null : $mapped;
+            $valueTypeResolver->resolver = is_callable($mapped) ? $mapped : null;
+            $objectMapper->addValueTypeResolver($valueTypeResolver);
         }
 
         return $objectMapper;

@@ -38,6 +38,9 @@ class ObjectMapper
     /** @var array */
     protected $namingMappers = [];
 
+    /** @var array */
+    protected $valueTypeResolvers = [];
+
     public function __construct(array $options = [], ?LoggerInterface $logger = null)
     {
         $this->namingMappers = [
@@ -59,6 +62,21 @@ class ObjectMapper
     public function getNamingMappers(): array
     {
         return $this->namingMappers;
+    }
+
+    public function setValueTypeResolvers(array $valueTypeResolvers): void
+    {
+        $this->valueTypeResolvers = $valueTypeResolvers;
+    }
+
+    public function addValueTypeResolver(ValueTypeResolverInterface $valueTypeResolver): void
+    {
+        $this->valueTypeResolvers[] = $valueTypeResolver;
+    }
+
+    public function getValueTypeResolvers(): array
+    {
+        return $this->valueTypeResolvers;
     }
 
     public function getPropertyAccessor(): PropertyAccessor
@@ -96,7 +114,23 @@ class ObjectMapper
         );
     }
 
-    public function getMapper($value, ?TypeReferenceInterface $typeReference): TypeMapperInterface
+    /**
+     * Resolve data types via registered value type resolvers.
+     */
+    public function resolveValueType(string $className, $json): string
+    {
+        foreach ($this->valueTypeResolvers as $valueTypeResolver) {
+            if ($mappedTypeClass = $valueTypeResolver->resolve($className, $json)) {
+                return $mappedTypeClass;
+            }
+        }
+        return $className;
+    }
+
+    /**
+     * Get the appropriate type mapper for the give data and type.
+     */
+    public function getTypeMapper($value, ?TypeReferenceInterface $typeReference): TypeMapperInterface
     {
         if ((!$typeReference && is_array($value)) || ($typeReference && $typeReference->isCollection())) {
             return new CollectionTypeMapper($this);
@@ -131,7 +165,7 @@ class ObjectMapper
             $type = is_object($type) ? new ObjectTypeReference($type) : new ClassTypeReference($type);
         }
 
-        $mapper = $this->getMapper($value, $type);
+        $mapper = $this->getTypeMapper($value, $type);
 
         return $mapper->map($value, $type);
     }

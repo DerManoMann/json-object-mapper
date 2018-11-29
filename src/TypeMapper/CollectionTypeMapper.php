@@ -46,7 +46,7 @@ class CollectionTypeMapper extends AbstractTypeMapper
 
         foreach ($value as $key => $val) {
             if ($valueType instanceof TypeReferenceInterface) {
-                $mapper = $this->getObjectMapper()->getMapper($val, $valueType);
+                $mapper = $this->getObjectMapper()->getTypeMapper($val, $valueType);
                 $val = $mapper->map($val, $valueType);
             }
             if ($obj instanceof \ArrayAccess) {

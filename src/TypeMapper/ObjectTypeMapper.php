@@ -37,7 +37,10 @@ class ObjectTypeMapper extends AbstractTypeMapper
             $obj = $typeReference->getObject();
         } elseif ($typeReference instanceof ClassTypeReference) {
             $typeClassName = $typeReference->getClassName();
-            $obj = new $typeClassName();
+
+            $resolvedTypeClassName = $this->getObjectMapper()->resolveValueType($typeClassName, $value);
+
+            $obj = new $resolvedTypeClassName();
         }
 
         $properties = (array)$propertyInfoExtractor->getProperties(get_class($obj));
