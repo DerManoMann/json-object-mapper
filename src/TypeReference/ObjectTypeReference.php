@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
 * This file is part of the ObjectMapper library.
@@ -13,6 +11,8 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\TypeReference;
 
+use Radebatz\ObjectMapper\TypeReferenceInterface;
+
 /**
  * Type reference to map into an existing value object.
  */
@@ -23,6 +23,14 @@ class ObjectTypeReference implements TypeReferenceInterface
     public function __construct($obj)
     {
         $this->obj = $obj;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isCollection(): bool
+    {
+        return $this->obj instanceof \ArrayObject;
     }
 
     public function getObject()

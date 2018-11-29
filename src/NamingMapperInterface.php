@@ -11,18 +11,17 @@ declare(strict_types=1);
 * file that was distributed with this source code.
 */
 
-namespace Radebatz\ObjectMapper\TypeMapper;
+namespace Radebatz\ObjectMapper;
 
 /**
  * Type mapper/resolver interface for any type that cannot be instantiated.
  */
-interface TypeMapperInterface
+interface NamingMapperInterface
 {
     /**
-     * @param string       $className The class/interface name to map
-     * @param array|object $json      The data to deserialize
+     * @param string $name The property name
      *
-     * @return string|null A instantiable class name
+     * @return string|null An alternative name
      */
-    public function resolve($className, $json): ?string;
+    public function resolve($name);
 }

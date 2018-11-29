@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\NamingMapper;
 
+use Radebatz\ObjectMapper\NamingMapperInterface;
+
 /**
  * Map property names to camel case.
  */

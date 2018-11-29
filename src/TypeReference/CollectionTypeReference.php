@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
 * This file is part of the ObjectMapper library.
@@ -13,6 +11,8 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\TypeReference;
 
+use Radebatz\ObjectMapper\TypeReferenceInterface;
+
 /**
  * Type reference to map data into a list/map with custom collection type classes allowed.
  *
@@ -24,13 +24,21 @@ class CollectionTypeReference implements TypeReferenceInterface
     protected $collectionType;
 
     /**
-     * @param string|ClassTypeReference $valueType      String values are taken as build in data type
-     * @param string                    $collectionType
+     * @param string|ClassTypeReference $valueType String values are taken as build in data type
+     * @param string $collectionType Collection class name
      */
     public function __construct($valueType = null, $collectionType = null)
     {
         $this->setValueType($valueType);
         $this->setCollectionType($collectionType);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isCollection(): bool
+    {
+        return true;
     }
 
     public function getValueType()
