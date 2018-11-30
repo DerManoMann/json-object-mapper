@@ -36,12 +36,6 @@ class TestCase extends BaseTestCase
      */
     protected function getObjectMapper(array $options = []): ObjectMapper
     {
-        $key = serialize($options);
-
-        if (!array_key_exists($key, $this->objectMappers)) {
-            $this->objectMappers[$key] = new ObjectMapper($options, $this->getLogger());
-        }
-
-        return $this->objectMappers[$key];
+        return new ObjectMapper($options, $this->getLogger());
     }
 }

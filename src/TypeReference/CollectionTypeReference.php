@@ -24,8 +24,8 @@ class CollectionTypeReference implements TypeReferenceInterface
     protected $collectionType;
 
     /**
-     * @param string|ClassTypeReference $valueType String values are taken as build in data type
-     * @param string $collectionType Collection class name
+     * @param string|ClassTypeReference $valueType      String values are taken as build in data type
+     * @param string                    $collectionType Collection class name
      */
     public function __construct($valueType = null, $collectionType = null)
     {

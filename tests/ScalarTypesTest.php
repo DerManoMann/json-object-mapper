@@ -21,7 +21,7 @@ class ScalarTypesTest extends TestCase
             ['"a string"', 'a string'],
             ['1', 1],
             ['false', false],
-            ['{"foo":"bar"}', (object)['foo' => 'bar']],
+            ['{"foo":"bar"}', (object) ['foo' => 'bar']],
             [1, 1],
             ['pong', 'pong', false],
         ];

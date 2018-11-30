@@ -11,6 +11,7 @@
 
 namespace Radebatz\ObjectMapper\TypeMapper;
 
+use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
 
 /**
@@ -21,6 +22,7 @@ class ScalarTypeMapper extends AbstractTypeMapper
     public function map($value, ?TypeReferenceInterface $typeReference = null)
     {
         // TODO: type validation
+        $strictTypes = $this->getObjectMapper()->getOption(ObjectMapper::OPTION_STRICT_TYPES);
 
         if (!$typeReference) {
             return $value;

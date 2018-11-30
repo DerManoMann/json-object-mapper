@@ -12,7 +12,9 @@
 namespace Radebatz\ObjectMapper;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Radebatz\ObjectMapper\NamingMapper\NoopNamingMapper;
+use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\TypeMapper\CollectionTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\NoopTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\ObjectTypeMapper;
@@ -35,17 +37,57 @@ class ObjectMapper
     public const OPTION_INSTANTIATE_REQUIRE_CTOR = 'instantiateRequireCtor';
     public const OPTION_UNKNOWN_PROPERTY_HANDLER = 'unknownPropertyHandler';
 
+    /** @var LoggerInterface */
+    protected $logger;
     /** @var array */
     protected $namingMappers = [];
-
     /** @var array */
     protected $valueTypeResolvers = [];
+    /** @var DocBlockCache */
+    protected $docBlockCache = null;
+    /** @var PropertyInfoExtractor */
+    protected $propertyInfoExtractor = null;
+    /** @var PropertyAccessor */
+    protected $propertyAccessor = null;
 
-    public function __construct(array $options = [], ?LoggerInterface $logger = null)
+    public function __construct(array $options = [], ?LoggerInterface $logger = null, DocBlockCache $docBlockCache = null, PropertyInfoExtractor $propertyInfoExtractor = null, PropertyAccess $propertyAccess = null)
     {
+        $this->options = array_merge($this->getDefaultOptions(), $options);
+        if ($this->options[self::OPTION_UNKNOWN_PROPERTY_HANDLER] && !is_callable($this->options[self::OPTION_UNKNOWN_PROPERTY_HANDLER])) {
+            throw new ObjectMapperException('Option "unknownPropertyHandler" must be callable');
+        }
+        $this->logger = $logger ?: new NullLogger();
+
         $this->namingMappers = [
             new NoopNamingMapper(),
         ];
+
+        $this->docBlockCache = $docBlockCache ?: new DocBlockCache();
+        $this->propertyInfoExtractor = $propertyInfoExtractor ?: $this->getDefaultPropertyInfoExtractor();
+        $this->propertyAccessor = $propertyAccess ?: $this->getDefaultPropertyAccessor();
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    protected function getDefaultOptions(): array
+    {
+        return [
+            self::OPTION_STRICT_TYPES => true,
+            self::OPTION_STRICT_COLLECTIONS => true,
+            self::OPTION_STRICT_NULL => true,
+            self::OPTION_IGNORE_UNKNOWN => true,
+            self::OPTION_VERIFY_REQUIRED => false,
+            self::OPTION_INSTANTIATE_REQUIRE_CTOR => true,
+            self::OPTION_UNKNOWN_PROPERTY_HANDLER => null,
+        ];
+    }
+
+    public function getOption(string $name)
+    {
+        return array_key_exists($name, $this->options) ? $this->options[$name] : null;
     }
 
     public function setNamingMappers(array $namingMappers): void
@@ -79,12 +121,27 @@ class ObjectMapper
         return $this->valueTypeResolvers;
     }
 
+    public function getDocBlockCache(): DocBlockCache
+    {
+        return $this->docBlockCache;
+    }
+
     public function getPropertyAccessor(): PropertyAccessor
+    {
+        return $this->propertyAccessor;
+    }
+
+    protected function getDefaultPropertyAccessor(): PropertyAccessor
     {
         return PropertyAccess::createPropertyAccessor();
     }
 
     public function getPropertyInfoExtractor(): PropertyInfoExtractor
+    {
+        return $this->propertyInfoExtractor;
+    }
+
+    protected function getDefaultPropertyInfoExtractor(): PropertyInfoExtractor
     {
         $phpDocExtractor = new PhpDocExtractor();
         $reflectionExtractor = new ReflectionExtractor();
@@ -115,19 +172,6 @@ class ObjectMapper
     }
 
     /**
-     * Resolve data types via registered value type resolvers.
-     */
-    public function resolveValueType(string $className, $json): string
-    {
-        foreach ($this->valueTypeResolvers as $valueTypeResolver) {
-            if ($mappedTypeClass = $valueTypeResolver->resolve($className, $json)) {
-                return $mappedTypeClass;
-            }
-        }
-        return $className;
-    }
-
-    /**
      * Get the appropriate type mapper for the give data and type.
      */
     public function getTypeMapper($value, ?TypeReferenceInterface $typeReference): TypeMapperInterface
@@ -151,9 +195,9 @@ class ObjectMapper
     /**
      * Map a given (complex) value onto a new/different type.
      *
-     * @param mixed $value The value.
-     * @param null|string|object|TypeReferenceInterface $type The target type.
-     * @param bool $encoded If set to true, `string` values will be json_decoded; defaults to `true`.
+     * @param mixed                                     $value   the value
+     * @param null|string|object|TypeReferenceInterface $type    the target type
+     * @param bool                                      $encoded if set to true, `string` values will be json_decoded; defaults to `true`
      */
     public function map($value, $type = null, bool $encoded = true)
     {

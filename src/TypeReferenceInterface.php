@@ -12,7 +12,7 @@
 namespace Radebatz\ObjectMapper;
 
 /**
- * Type declaration
+ * Type declaration.
  */
 interface TypeReferenceInterface
 {

@@ -17,7 +17,6 @@ use Radebatz\ObjectMapper\Tests\Models\AnotherPopo;
 use Radebatz\ObjectMapper\Tests\Models\NestedPopo;
 use Radebatz\ObjectMapper\Tests\Models\PopoInterface;
 use Radebatz\ObjectMapper\Tests\Models\SimplePopo;
-use Radebatz\ObjectMapper\TypeMapper\TypeMapperInterface;
 use Radebatz\ObjectMapper\ValueTypeResolverInterface;
 
 class ValueTypeResolverTest extends TestCase
