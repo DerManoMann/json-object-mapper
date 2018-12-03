@@ -14,9 +14,9 @@ namespace Radebatz\ObjectMapper\TypeReference;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
 
 /**
- * Type reference to map data into a list/map with custom collection type classes allowed.
+ * Type reference tfor collections.
  *
- * Custom collection types are expected to have a constructor that accepts the collection data.
+ * A `collectionType` value of `null` will be resolved as simple `array` / `[]`.
  */
 class CollectionTypeReference implements TypeReferenceInterface
 {
