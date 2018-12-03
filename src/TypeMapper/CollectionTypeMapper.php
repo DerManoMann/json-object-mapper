@@ -37,9 +37,12 @@ class CollectionTypeMapper extends AbstractTypeMapper
             $valueType = $typeReference->getClassName();
             $obj = new $valueType();
         } elseif ($typeReference instanceof CollectionTypeReference) {
-            $collectionType = $typeReference->getCollectionType();
+            if ($collectionType = $typeReference->getCollectionType()) {
+                $obj = new $collectionType();
+            } else {
+                $obj = [];
+            }
             $valueType = $typeReference->getValueType();
-            $obj = new $collectionType();
         }
 
         $propertyAccessor = $this->getObjectMapper()->getPropertyAccessor();
@@ -51,6 +54,8 @@ class CollectionTypeMapper extends AbstractTypeMapper
             }
             if ($obj instanceof \ArrayAccess) {
                 $obj->offsetSet($key, $val);
+            } elseif (is_array($obj)) {
+                $obj[$key] = $val;
             } elseif (get_class($obj) === \stdClass::class) {
                 $obj->{$key} = $val;
             } else {

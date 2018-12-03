@@ -20,7 +20,9 @@ use Radebatz\ObjectMapper\TypeMapper\NoopTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\ObjectTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\ScalarTypeMapper;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
+use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
+use Radebatz\ObjectMapper\TypeReference\ScalarTypeReference;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -181,8 +183,14 @@ class ObjectMapper
         }
 
         if ($typeReference) {
-            // assume class
-            return new ObjectTypeMapper($this);
+            switch (get_class($typeReference)) {
+                case ScalarTypeReference::class:
+                    return new ScalarTypeMapper($this);
+                case CollectionTypeReference::class:
+                    return new CollectionTypeMapper($this);
+                default:
+                    return new ObjectTypeMapper($this);
+            }
         }
 
         if (is_scalar($value)) {

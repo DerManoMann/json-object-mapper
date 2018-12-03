@@ -16,6 +16,7 @@ use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
+use Radebatz\ObjectMapper\TypeReference\TypeReferenceFactory;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
 use Symfony\Component\PropertyAccess\Exception\ExceptionInterface as PropertyAccessExceptionInterface;
 
@@ -44,6 +45,8 @@ class ObjectTypeMapper extends AbstractTypeMapper
             $resolvedTypeClassName = $this->resolveValueType($typeClassName, $value);
 
             $obj = new $resolvedTypeClassName();
+        } else {
+            throw new ObjectMapperException(sprintf('Unexpected type reference: %s', get_class($typeReference)));
         }
 
         // keep track of mapped properties in case we want to verify required ones later
@@ -51,37 +54,39 @@ class ObjectTypeMapper extends AbstractTypeMapper
 
         $properties = (array) $propertyInfoExtractor->getProperties(get_class($obj));
 
-        foreach ((array) $value as $key => $val) {
-            $keys = array_map(function (NamingMapperInterface $namingMapper) use ($key) {
-                return $namingMapper->resolve($key);
+        foreach ((array) $value as $valueKey => $val) {
+            $keys = array_map(function (NamingMapperInterface $namingMapper) use ($valueKey) {
+                return $namingMapper->resolve($valueKey);
             }, $this->getObjectMapper()->getNamingMappers());
 
             $mapped = false;
             foreach ($keys as $key) {
-                if (null === $key || !in_array($key, $properties)) {
+                if (null === $key) {
                     continue;
                 }
 
                 // TODO: move into abstract parent
                 $valueTypeReference = null;
                 if ($types = $propertyInfoExtractor->getTypes(get_class($obj), $key)) {
-                    $type = $types[0];
-                    if ($className = $type->getClassName()) {
-                        $valueTypeReference = new ClassTypeReference($className);
-                    } else {
-                        // TODO:??
-                    }
+                    $valueTypeReference = TypeReferenceFactory::getTypeReferenceForType($types[0]);
                 }
+
                 $valueTypeMapper = $this->getObjectMapper()->getTypeMapper($val, $valueTypeReference);
+                $mappedValue = $valueTypeMapper->map($val, $valueTypeReference);
 
-                try {
-                    $propertyAccessor->setValue($obj, $key, $valueTypeMapper->map($val, $valueTypeReference));
-                } catch (PropertyAccessExceptionInterface $e) {
-                    throw new ObjectMapperException($e->getMessage(), $e->getCode(), $e);
+                if (in_array($key, $properties)) {
+                    try {
+                        $propertyAccessor->setValue($obj, $key, $mappedValue);
+                        $mapped = true;
+                        break;
+                    } catch (PropertyAccessExceptionInterface $e) {
+                        throw new ObjectMapperException($e->getMessage(), $e->getCode(), $e);
+                    }
+                } elseif (get_class($obj) === \stdClass::class) {
+                    $obj->{$key} = $mappedValue;
+                    $mapped = true;
+                    break;
                 }
-
-                $mapped = true;
-                break;
             }
 
             if (!$mapped) {
@@ -90,7 +95,7 @@ class ObjectTypeMapper extends AbstractTypeMapper
         }
 
         if ($this->getObjectMapper()->getOption(ObjectMapper::OPTION_VERIFY_REQUIRED)) {
-            $this->verifyRequiredProperties($className, $properties, $mappedProperties);
+            $this->verifyRequiredProperties($resolvedTypeClassName, $properties, $mappedProperties);
         }
 
         // TODO: type juggling / mapping

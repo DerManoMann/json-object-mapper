@@ -26,7 +26,10 @@ class DataTypeTest extends TestCase
             ['{"proInt":"abc"}', true, true],
             ['{"proString":false}', false, false],
             ['{"proInt":1,"proBool":false}', false, false],
-            ['{"proInt":"abc"}', false, false],
+            ['{"proInt":"abc"}', false, true], // fails due to strict typing
+            ['{"weakTyped":1}', true, false],
+            ['{"weakTyped":"abc"}', true, true],
+            ['{"weakTyped":"abc"}', false, false],
         ];
     }
 
@@ -44,7 +47,7 @@ class DataTypeTest extends TestCase
 
             $this->assertFalse($fail, '*Expected* to fail');
         } catch (ObjectMapperException $e) {
-            $this->assertTrue($fail, 'Expected *NOT* to fail');
+            $this->assertTrue($fail, sprintf('Expected *NOT* to fail: %s', $e->getMessage()));
         }
     }
 }

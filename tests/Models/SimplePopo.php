@@ -22,6 +22,7 @@ class SimplePopo implements PopoInterface, \JsonSerializable
     protected $proBool = true;
     protected $proFloats = [];
     protected $date = null;
+    protected $weakTyped = 0;
 
     public function getProString(): ?string
     {
@@ -93,6 +94,22 @@ class SimplePopo implements PopoInterface, \JsonSerializable
     }
 
     /**
+     * @return int
+     */
+    public function getWeakTyped()
+    {
+        return $this->weakTyped;
+    }
+
+    /**
+     * @param int
+     */
+    public function setWeakTyped($weakTyped)
+    {
+        $this->weakTyped = $weakTyped;
+    }
+
+    /**
      * @inheritdoc
      */
     public function jsonSerialize()
@@ -105,6 +122,7 @@ class SimplePopo implements PopoInterface, \JsonSerializable
             'proBool' => $this->proBool,
             'proFloats' => $this->proFloats,
             'date' => $this->date ? $this->date->format(\DateTime::ISO8601) : null,
+            'mixed' => $this->weakTyped,
         ];
     }
 }

@@ -21,7 +21,7 @@ use Radebatz\ObjectMapper\TypeReferenceInterface;
 class CollectionTypeReference implements TypeReferenceInterface
 {
     protected $valueType;
-    protected $collectionType;
+    protected $collectionType = null;
 
     /**
      * @param string|ClassTypeReference $valueType      String values are taken as build in data type
@@ -51,13 +51,13 @@ class CollectionTypeReference implements TypeReferenceInterface
         $this->valueType = $valueType;
     }
 
-    public function getCollectionType()
+    public function getCollectionType(): ?string
     {
         return $this->collectionType;
     }
 
-    public function setCollectionType($collectionType)
+    public function setCollectionType(?string $collectionType)
     {
-        $this->collectionType = $collectionType ?: \ArrayObject::class;
+        $this->collectionType = $collectionType;
     }
 }
