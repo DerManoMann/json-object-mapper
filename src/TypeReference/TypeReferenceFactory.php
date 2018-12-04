@@ -27,7 +27,7 @@ class TypeReferenceFactory
         if ($buildInType = $type->getBuiltinType()) {
             switch ($buildInType) {
                 case Type::BUILTIN_TYPE_ARRAY:
-                    // TODO: collection key typy
+                    // TODO: collection key type
                     return new CollectionTypeReference(self::getTypeReferenceForType($type->getCollectionValueType()));
 
                 case Type::BUILTIN_TYPE_INT:

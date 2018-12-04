@@ -49,7 +49,9 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
         }
 
         if ($unknownPropertyHandler = $objectMapper->getOption(ObjectMapper::OPTION_UNKNOWN_PROPERTY_HANDLER)) {
-            return call_user_func($unknownPropertyHandler, $obj, $key, $value);
+            if (null !== ($mappedKey = call_user_func($unknownPropertyHandler, $obj, $key, $value))) {
+                return $mappedKey;
+            }
         }
 
         if (!$objectMapper->getOption(ObjectMapper::OPTION_IGNORE_UNKNOWN)) {

@@ -189,6 +189,7 @@ class ObjectMapper
                 case CollectionTypeReference::class:
                     return new CollectionTypeMapper($this);
                 default:
+                    // TODO: allow custom class based mappers
                     return new ObjectTypeMapper($this);
             }
         }

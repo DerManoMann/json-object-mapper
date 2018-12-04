@@ -23,8 +23,6 @@ class CollectionTypeMapper extends AbstractTypeMapper
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null)
     {
-        // TODO: type validation
-
         if (!$typeReference || null === $value) {
             return $value;
         }

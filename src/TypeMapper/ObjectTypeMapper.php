@@ -27,8 +27,6 @@ class ObjectTypeMapper extends AbstractTypeMapper
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null)
     {
-        // TODO: type validation
-
         if (!$typeReference || null === $value) {
             return $value;
         }
@@ -89,16 +87,13 @@ class ObjectTypeMapper extends AbstractTypeMapper
                 }
             }
 
-            if (!$mapped) {
-                $mappedProperties[] = $this->handleUnmappedProperty($obj, $key, $val);
-            }
+            $mappedProperties[] = $mapped ? $key : $this->handleUnmappedProperty($obj, $key, $val);
         }
 
         if ($this->getObjectMapper()->getOption(ObjectMapper::OPTION_VERIFY_REQUIRED)) {
             $this->verifyRequiredProperties($resolvedTypeClassName, $properties, $mappedProperties);
         }
 
-        // TODO: type juggling / mapping
         return $obj;
     }
 }
