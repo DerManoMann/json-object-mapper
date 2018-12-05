@@ -17,7 +17,7 @@ use Radebatz\ObjectMapper\NamingMapper\NoopNamingMapper;
 use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\TypeMapper\CollectionTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\NoopTypeMapper;
-use Radebatz\ObjectMapper\TypeMapper\ObjectTypeMapper;
+use Radebatz\ObjectMapper\TypeMapper\DefaultObjectTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\ScalarTypeMapper;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
@@ -51,6 +51,8 @@ class ObjectMapper
     protected $propertyInfoExtractor = null;
     /** @var PropertyAccessor */
     protected $propertyAccessor = null;
+    /** @var array */
+    protected $objectTypeMappers = [];
 
     public function __construct(array $options = [], ?LoggerInterface $logger = null, DocBlockCache $docBlockCache = null, PropertyInfoExtractor $propertyInfoExtractor = null, PropertyAccess $propertyAccess = null)
     {
@@ -123,6 +125,21 @@ class ObjectMapper
         return $this->valueTypeResolvers;
     }
 
+    public function setObjectTypeMappers(array $objectTypeMappers): void
+    {
+        $this->objectTypeMappers = $objectTypeMappers;
+    }
+
+    public function setObjectTypeMapper(string $className, TypeMapperInterface $objectTypeMapper): void
+    {
+        $this->objectTypeMappers[$className] = $objectTypeMapper;
+    }
+
+    public function getObjectTypeMappers(): array
+    {
+        return $this->objectTypeMappers;
+    }
+
     public function getDocBlockCache(): DocBlockCache
     {
         return $this->docBlockCache;
@@ -188,9 +205,18 @@ class ObjectMapper
                     return new ScalarTypeMapper($this);
                 case CollectionTypeReference::class:
                     return new CollectionTypeMapper($this);
+                case ClassTypeReference::class:
+                    // TODO: resolve class mapping?
+
+                    /** @var ClassTypeReference $typeReference */
+                    if (array_key_exists($className = $typeReference->getClassName(), $this->objectTypeMappers)) {
+                        return $this->objectTypeMappers[$className];
+                    }
+
+                    // fall through
+                    // no break
                 default:
-                    // TODO: allow custom class based mappers
-                    return new ObjectTypeMapper($this);
+                    return new DefaultObjectTypeMapper($this);
             }
         }
 

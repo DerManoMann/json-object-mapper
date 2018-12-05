@@ -73,4 +73,20 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
             }
         }
     }
+
+    /**
+     * @throws \ReflectionException
+     */
+    protected function instantiate($value, string $className)
+    {
+        try {
+            return new $className();
+        } catch (\ArgumentCountError $e) {
+            if ($this->getObjectMapper()->getOption(ObjectMapper::OPTION_INSTANTIATE_REQUIRE_CTOR)) {
+                throw new ObjectMapperException(sprintf('Unable to instantiate value object; class=%s', $className), $e->getCode(), $e);
+            }
+
+            return (new \ReflectionClass($className))->newInstanceWithoutConstructor();
+        }
+    }
 }

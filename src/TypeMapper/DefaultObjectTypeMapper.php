@@ -18,12 +18,12 @@ use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\TypeReference\TypeReferenceFactory;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
-use Symfony\Component\PropertyAccess\Exception\ExceptionInterface as PropertyAccessExceptionInterface;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 /**
- * Maps a value onto an object.
+ * Default object type mapper.
  */
-class ObjectTypeMapper extends AbstractTypeMapper
+class DefaultObjectTypeMapper extends AbstractTypeMapper
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null)
     {
@@ -42,7 +42,7 @@ class ObjectTypeMapper extends AbstractTypeMapper
 
             $resolvedTypeClassName = $this->resolveValueType($typeClassName, $value);
 
-            $obj = new $resolvedTypeClassName();
+            $obj = $this->instantiate($value, $resolvedTypeClassName);
         } else {
             throw new ObjectMapperException(sprintf('Unexpected type reference: %s', get_class($typeReference)));
         }
@@ -76,10 +76,12 @@ class ObjectTypeMapper extends AbstractTypeMapper
                     try {
                         $propertyAccessor->setValue($obj, $key, $mappedValue);
                         $mapped = true;
-                        break;
-                    } catch (PropertyAccessExceptionInterface $e) {
-                        throw new ObjectMapperException($e->getMessage(), $e->getCode(), $e);
+                    } catch (NoSuchPropertyException $e) {
+                        // ignore
+                    } catch (\Throwable $t) {
+                        throw new ObjectMapperException($t->getMessage(), $t->getCode(), $t);
                     }
+                    break;
                 } elseif (get_class($obj) === \stdClass::class) {
                     $obj->{$key} = $mappedValue;
                     $mapped = true;
@@ -91,7 +93,7 @@ class ObjectTypeMapper extends AbstractTypeMapper
         }
 
         if ($this->getObjectMapper()->getOption(ObjectMapper::OPTION_VERIFY_REQUIRED)) {
-            $this->verifyRequiredProperties($resolvedTypeClassName, $properties, $mappedProperties);
+            $this->verifyRequiredProperties(get_class($obj), $properties, $mappedProperties);
         }
 
         return $obj;

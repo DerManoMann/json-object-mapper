@@ -32,8 +32,11 @@ class CollectionTypeMapper extends AbstractTypeMapper
         if ($typeReference instanceof ObjectTypeReference) {
             $obj = $typeReference->getObject();
         } elseif ($typeReference instanceof ClassTypeReference) {
-            $valueType = $typeReference->getClassName();
-            $obj = new $valueType();
+            $valueTypeClassName = $typeReference->getClassName();
+
+            $resolvedValueTypeClassName = $this->resolveValueType($valueTypeClassName, $value);
+
+            $obj = $this->instantiate($value, $resolvedValueTypeClassName);
         } elseif ($typeReference instanceof CollectionTypeReference) {
             if ($collectionType = $typeReference->getCollectionType()) {
                 $obj = new $collectionType();
@@ -45,11 +48,12 @@ class CollectionTypeMapper extends AbstractTypeMapper
 
         $propertyAccessor = $this->getObjectMapper()->getPropertyAccessor();
 
-        foreach ($value as $key => $val) {
+        foreach ((array) $value as $key => $val) {
             if ($valueType instanceof TypeReferenceInterface) {
                 $mapper = $this->getObjectMapper()->getTypeMapper($val, $valueType);
                 $val = $mapper->map($val, $valueType);
             }
+
             if ($obj instanceof \ArrayAccess) {
                 $obj->offsetSet($key, $val);
             } elseif (is_array($obj)) {
