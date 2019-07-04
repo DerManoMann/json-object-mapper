@@ -245,8 +245,12 @@ class ObjectMapper
                     // TODO: resolve class mapping?
 
                     /** @var ClassTypeReference $typeReference */
-                    if (array_key_exists($className = $typeReference->getClassName(), $this->objectTypeMappers)) {
-                        return $this->objectTypeMappers[$className];
+                    $className = $typeReference->getClassName();
+                    $classInterfaces = class_implements($className);
+                    foreach ($this->objectTypeMappers as $name => $objectTypeMapper) {
+                        if ($name === $className || in_array($name, $classInterfaces)) {
+                            return $objectTypeMapper;
+                        }
                     }
 
                 // fall through

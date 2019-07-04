@@ -49,4 +49,23 @@ class DateTimeTypeMapperTest extends TestCase
         // use timestamp here as we do lose millis otherwise
         $this->assertEquals($timestamp, $simplePopo->getDate()->getTimestamp());
     }
+
+    /**
+     * @dataProvider json
+     */
+    public function testDateTimeInterface($json, $timestamp)
+    {
+        $options = [
+            ObjectMapper::OPTION_STRICT_TYPES => false,
+        ];
+        $objectMapper = $this->getObjectMapper($options);
+        $objectMapper->setObjectTypeMapper(\DateTimeInterface::class, new DateTimeTypeMapper($objectMapper));
+
+        /** @var SimplePopo $simplePopo */
+        $simplePopo = $objectMapper->map($json, SimplePopo::class);
+        $this->assertInstanceOf(SimplePopo::class, $simplePopo);
+        $this->assertNotNull($simplePopo->getDate());
+        // use timestamp here as we do lose millis otherwise
+        $this->assertEquals($timestamp, $simplePopo->getDate()->getTimestamp());
+    }
 }
