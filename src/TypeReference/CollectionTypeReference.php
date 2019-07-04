@@ -27,10 +27,10 @@ class CollectionTypeReference implements TypeReferenceInterface
      * @param string|ClassTypeReference $valueType      String values are taken as build in data type
      * @param string                    $collectionType Collection class name
      */
-    public function __construct($valueType = null, $collectionType = null)
+    public function __construct($valueType, $collectionType = null)
     {
-        $this->setValueType($valueType);
-        $this->setCollectionType($collectionType);
+        $this->valueType = $valueType;
+        $this->collectionType = $collectionType;
     }
 
     /**
@@ -46,18 +46,8 @@ class CollectionTypeReference implements TypeReferenceInterface
         return $this->valueType;
     }
 
-    public function setValueType($valueType)
-    {
-        $this->valueType = $valueType;
-    }
-
     public function getCollectionType(): ?string
     {
         return $this->collectionType;
-    }
-
-    public function setCollectionType(?string $collectionType)
-    {
-        $this->collectionType = $collectionType;
     }
 }

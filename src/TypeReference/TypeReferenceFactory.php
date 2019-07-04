@@ -35,7 +35,7 @@ class TypeReferenceFactory
                 case Type::BUILTIN_TYPE_STRING:
                 case Type::BUILTIN_TYPE_BOOL:
                 case Type::BUILTIN_TYPE_NULL:
-                    return new ScalarTypeReference($buildInType);
+                    return new ScalarTypeReference($buildInType, $type->isNullable());
 
                 case Type::BUILTIN_TYPE_CALLABLE:
                 case Type::BUILTIN_TYPE_RESOURCE:

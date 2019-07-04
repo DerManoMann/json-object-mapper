@@ -19,10 +19,12 @@ use Radebatz\ObjectMapper\TypeReferenceInterface;
 class ScalarTypeReference implements TypeReferenceInterface
 {
     protected $scalarType;
+    protected $nullable;
 
-    public function __construct(string $scalarType)
+    public function __construct(string $scalarType, bool $nullable)
     {
         $this->scalarType = $scalarType;
+        $this->nullable = $nullable;
     }
 
     /**
@@ -31,6 +33,11 @@ class ScalarTypeReference implements TypeReferenceInterface
     public function isCollection(): bool
     {
         return false;
+    }
+
+    public function isNullable()
+    {
+        return $this->nullable;
     }
 
     public function getScalarType(): string

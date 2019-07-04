@@ -19,6 +19,7 @@ use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\TypeReference\TypeReferenceFactory;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 /**
  * Default object type mapper.
@@ -63,16 +64,8 @@ class DefaultObjectTypeMapper extends AbstractTypeMapper
                     continue;
                 }
 
-                // TODO: move into abstract parent
-                $valueTypeReference = null;
-                if ($types = $propertyInfoExtractor->getTypes(get_class($obj), $key)) {
-                    $valueTypeReference = TypeReferenceFactory::getTypeReferenceForType($types[0]);
-                }
-
-                $valueTypeMapper = $this->getObjectMapper()->getTypeMapper($val, $valueTypeReference);
-                $mappedValue = $valueTypeMapper->map($val, $valueTypeReference);
-
                 if (in_array($key, $properties)) {
+                    $mappedValue = $this->mapValue($obj, $key, $val, $propertyInfoExtractor);
                     try {
                         $propertyAccessor->setValue($obj, $key, $mappedValue);
                         $mapped = true;
@@ -83,6 +76,7 @@ class DefaultObjectTypeMapper extends AbstractTypeMapper
                     }
                     break;
                 } elseif (get_class($obj) === \stdClass::class) {
+                    $mappedValue = $this->mapValue($obj, $key, $val, $propertyInfoExtractor);
                     $obj->{$key} = $mappedValue;
                     $mapped = true;
                     break;
@@ -97,5 +91,17 @@ class DefaultObjectTypeMapper extends AbstractTypeMapper
         }
 
         return $obj;
+    }
+
+    protected function mapValue($obj, $key, $val, PropertyInfoExtractor $propertyInfoExtractor)
+    {
+        $valueTypeReference = null;
+        if ($types = $propertyInfoExtractor->getTypes(get_class($obj), $key)) {
+            $valueTypeReference = TypeReferenceFactory::getTypeReferenceForType($types[0]);
+        }
+
+        $valueTypeMapper = $this->getObjectMapper()->getTypeMapper($val, $valueTypeReference);
+
+        return $valueTypeMapper->map($val, $valueTypeReference);
     }
 }
