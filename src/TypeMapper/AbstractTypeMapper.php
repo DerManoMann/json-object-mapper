@@ -40,7 +40,7 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
         return $className;
     }
 
-    protected function handleUnmappedProperty($obj, string $key, $value)
+    protected function handleUnmappedProperty($obj, $key, $value)
     {
         $objectMapper = $this->getObjectMapper();
 
@@ -54,7 +54,7 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
             }
         }
 
-        if (!$objectMapper->getOption(ObjectMapper::OPTION_IGNORE_UNKNOWN)) {
+        if (!$objectMapper->isOption(ObjectMapper::OPTION_IGNORE_UNKNOWN)) {
             throw new ObjectMapperException(sprintf('Unmapped property; name=%s, class=%s', $key, get_class($obj)));
         }
 
@@ -80,9 +80,16 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
     protected function instantiate($value, string $className)
     {
         try {
+            $rc = new \ReflectionClass($className);
+            if (($ctor = $rc->getConstructor()) && $ctor->getParameters()) {
+                if (is_scalar($value)) {
+                    return new $className($value);
+                }
+            }
+
             return new $className();
         } catch (\ArgumentCountError $e) {
-            if ($this->getObjectMapper()->getOption(ObjectMapper::OPTION_INSTANTIATE_REQUIRE_CTOR)) {
+            if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_INSTANTIATE_REQUIRE_CTOR)) {
                 throw new ObjectMapperException(sprintf('Unable to instantiate value object; class=%s', $className), $e->getCode(), $e);
             }
 

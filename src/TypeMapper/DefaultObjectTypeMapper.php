@@ -92,7 +92,7 @@ class DefaultObjectTypeMapper extends AbstractTypeMapper
             $mappedProperties[] = $mapped ? $key : $this->handleUnmappedProperty($obj, $key, $val);
         }
 
-        if ($this->getObjectMapper()->getOption(ObjectMapper::OPTION_VERIFY_REQUIRED)) {
+        if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_VERIFY_REQUIRED)) {
             $this->verifyRequiredProperties(get_class($obj), $properties, $mappedProperties);
         }
 

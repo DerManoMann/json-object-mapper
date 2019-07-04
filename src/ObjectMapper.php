@@ -16,8 +16,8 @@ use Psr\Log\NullLogger;
 use Radebatz\ObjectMapper\NamingMapper\NoopNamingMapper;
 use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\TypeMapper\CollectionTypeMapper;
-use Radebatz\ObjectMapper\TypeMapper\NoopTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\DefaultObjectTypeMapper;
+use Radebatz\ObjectMapper\TypeMapper\NoopTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\ScalarTypeMapper;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
@@ -32,7 +32,9 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 class ObjectMapper
 {
     public const OPTION_STRICT_TYPES = 'strictTypes';
+    // TODO: implement */
     public const OPTION_STRICT_COLLECTIONS = 'strictCollections';
+    // TODO: implement */
     public const OPTION_STRICT_NULL = 'strictNull';
     public const OPTION_IGNORE_UNKNOWN = 'ignoreUnknown';
     public const OPTION_VERIFY_REQUIRED = 'verifyRequired';
@@ -71,11 +73,6 @@ class ObjectMapper
         $this->propertyAccessor = $propertyAccess ?: $this->getDefaultPropertyAccessor();
     }
 
-    public function getLogger(): LoggerInterface
-    {
-        return $this->logger;
-    }
-
     protected function getDefaultOptions(): array
     {
         return [
@@ -87,77 +84,6 @@ class ObjectMapper
             self::OPTION_INSTANTIATE_REQUIRE_CTOR => true,
             self::OPTION_UNKNOWN_PROPERTY_HANDLER => null,
         ];
-    }
-
-    public function getOption(string $name)
-    {
-        return array_key_exists($name, $this->options) ? $this->options[$name] : null;
-    }
-
-    public function setNamingMappers(array $namingMappers): void
-    {
-        $this->namingMappers = $namingMappers;
-    }
-
-    public function addNamingMapper(NamingMapperInterface $namingMapper): void
-    {
-        // default is always last
-        array_unshift($this->namingMappers, $namingMapper);
-    }
-
-    public function getNamingMappers(): array
-    {
-        return $this->namingMappers;
-    }
-
-    public function setValueTypeResolvers(array $valueTypeResolvers): void
-    {
-        $this->valueTypeResolvers = $valueTypeResolvers;
-    }
-
-    public function addValueTypeResolver(ValueTypeResolverInterface $valueTypeResolver): void
-    {
-        $this->valueTypeResolvers[] = $valueTypeResolver;
-    }
-
-    public function getValueTypeResolvers(): array
-    {
-        return $this->valueTypeResolvers;
-    }
-
-    public function setObjectTypeMappers(array $objectTypeMappers): void
-    {
-        $this->objectTypeMappers = $objectTypeMappers;
-    }
-
-    public function setObjectTypeMapper(string $className, TypeMapperInterface $objectTypeMapper): void
-    {
-        $this->objectTypeMappers[$className] = $objectTypeMapper;
-    }
-
-    public function getObjectTypeMappers(): array
-    {
-        return $this->objectTypeMappers;
-    }
-
-    public function getDocBlockCache(): DocBlockCache
-    {
-        return $this->docBlockCache;
-    }
-
-    public function getPropertyAccessor(): PropertyAccessor
-    {
-        return $this->propertyAccessor;
-    }
-
-    protected function getDefaultPropertyAccessor(): PropertyAccessor
-    {
-        return PropertyAccess::createPropertyAccessor();
-    }
-
-    public function getPropertyInfoExtractor(): PropertyInfoExtractor
-    {
-        return $this->propertyInfoExtractor;
     }
 
     protected function getDefaultPropertyInfoExtractor(): PropertyInfoExtractor
@@ -190,41 +116,85 @@ class ObjectMapper
         );
     }
 
-    /**
-     * Get the appropriate type mapper for the give data and type.
-     */
-    public function getTypeMapper($value, ?TypeReferenceInterface $typeReference): TypeMapperInterface
+    protected function getDefaultPropertyAccessor(): PropertyAccessor
     {
-        if ((!$typeReference && is_array($value)) || ($typeReference && $typeReference->isCollection())) {
-            return new CollectionTypeMapper($this);
-        }
+        return PropertyAccess::createPropertyAccessor();
+    }
 
-        if ($typeReference) {
-            switch (get_class($typeReference)) {
-                case ScalarTypeReference::class:
-                    return new ScalarTypeMapper($this);
-                case CollectionTypeReference::class:
-                    return new CollectionTypeMapper($this);
-                case ClassTypeReference::class:
-                    // TODO: resolve class mapping?
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
 
-                    /** @var ClassTypeReference $typeReference */
-                    if (array_key_exists($className = $typeReference->getClassName(), $this->objectTypeMappers)) {
-                        return $this->objectTypeMappers[$className];
-                    }
+    public function isOption(string $name): bool
+    {
+        return array_key_exists($name, $this->options) ? (bool) $this->options[$name] : false;
+    }
 
-                    // fall through
-                    // no break
-                default:
-                    return new DefaultObjectTypeMapper($this);
-            }
-        }
+    public function getOption(string $name)
+    {
+        return array_key_exists($name, $this->options) ? $this->options[$name] : null;
+    }
 
-        if (is_scalar($value)) {
-            return new ScalarTypeMapper($this);
-        }
+    public function addNamingMapper(NamingMapperInterface $namingMapper): void
+    {
+        // default is always last
+        array_unshift($this->namingMappers, $namingMapper);
+    }
 
-        return new NoopTypeMapper($this);
+    public function getNamingMappers(): array
+    {
+        return $this->namingMappers;
+    }
+
+    public function setNamingMappers(array $namingMappers): void
+    {
+        $this->namingMappers = $namingMappers;
+    }
+
+    public function addValueTypeResolver(ValueTypeResolverInterface $valueTypeResolver): void
+    {
+        $this->valueTypeResolvers[] = $valueTypeResolver;
+    }
+
+    public function getValueTypeResolvers(): array
+    {
+        return $this->valueTypeResolvers;
+    }
+
+    public function setValueTypeResolvers(array $valueTypeResolvers): void
+    {
+        $this->valueTypeResolvers = $valueTypeResolvers;
+    }
+
+    public function setObjectTypeMapper(string $className, TypeMapperInterface $objectTypeMapper): void
+    {
+        $this->objectTypeMappers[$className] = $objectTypeMapper;
+    }
+
+    public function getObjectTypeMappers(): array
+    {
+        return $this->objectTypeMappers;
+    }
+
+    public function setObjectTypeMappers(array $objectTypeMappers): void
+    {
+        $this->objectTypeMappers = $objectTypeMappers;
+    }
+
+    public function getDocBlockCache(): DocBlockCache
+    {
+        return $this->docBlockCache;
+    }
+
+    public function getPropertyAccessor(): PropertyAccessor
+    {
+        return $this->propertyAccessor;
+    }
+
+    public function getPropertyInfoExtractor(): PropertyInfoExtractor
+    {
+        return $this->propertyInfoExtractor;
     }
 
     /**
@@ -247,5 +217,45 @@ class ObjectMapper
         $mapper = $this->getTypeMapper($value, $type);
 
         return $mapper->map($value, $type);
+    }
+
+    /**
+     * Get the appropriate type mapper for the give data and type.
+     */
+    public function getTypeMapper($value, ?TypeReferenceInterface $typeReference): TypeMapperInterface
+    {
+        if ((!$typeReference && is_array($value)) || ($typeReference && $typeReference->isCollection())) {
+            return new CollectionTypeMapper($this);
+        }
+
+        if ($typeReference) {
+            switch (get_class($typeReference)) {
+                case ScalarTypeReference::class:
+                    return new ScalarTypeMapper($this);
+
+                case CollectionTypeReference::class:
+                    return new CollectionTypeMapper($this);
+
+                case ClassTypeReference::class:
+                    // TODO: resolve class mapping?
+
+                    /** @var ClassTypeReference $typeReference */
+                    if (array_key_exists($className = $typeReference->getClassName(), $this->objectTypeMappers)) {
+                        return $this->objectTypeMappers[$className];
+                    }
+
+                // fall through
+                // no break
+
+                default:
+                    return new DefaultObjectTypeMapper($this);
+            }
+        }
+
+        if (is_scalar($value)) {
+            return new ScalarTypeMapper($this);
+        }
+
+        return new NoopTypeMapper($this);
     }
 }

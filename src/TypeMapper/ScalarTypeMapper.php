@@ -23,18 +23,20 @@ class ScalarTypeMapper extends AbstractTypeMapper
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null)
     {
-        if (!$typeReference || !($strictTypes = $this->getObjectMapper()->getOption(ObjectMapper::OPTION_STRICT_TYPES))) {
+        if (!$typeReference) {
             return $value;
         }
 
         if ($typeReference instanceof ScalarTypeReference && null !== $value) {
-            $compatibleType = $this->getCompatibleType(gettype($value), $scalarType = $typeReference->getScalarType());
+            $strictTypes = $this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_TYPES);
+
+            $compatibleType = $this->getCompatibleType($value, $scalarType = $typeReference->getScalarType(), $strictTypes);
 
             if ($strictTypes && !$compatibleType) {
-                throw new ObjectMapperException(sprintf('Incompatible data type; type=%s, expected=%s', gettype($value), $compatibleType));
+                throw new ObjectMapperException(sprintf('Incompatible data type; type=%s, expected=%s', gettype($value), $scalarType));
             }
 
-            if (false === settype($value, $compatibleType ?: $scalarType)) {
+            if ($compatibleType && false === settype($value, $compatibleType)) {
                 throw new ObjectMapperException(sprintf('Incompatible data type; type=%s', gettype($value)));
             }
         }
@@ -42,28 +44,68 @@ class ScalarTypeMapper extends AbstractTypeMapper
         return $value;
     }
 
-    protected function getCompatibleType(string $type, string $expected): ?string
+    protected function getCompatibleType($value, string $expectedType, bool $strictTypes = true): ?string
     {
+        $valueType = gettype($value);
+
         $alias = [
             'int' => 'integer',
             'bool' => 'boolean',
         ];
+        $expectedType = array_key_exists($expectedType, $alias) ? $alias[$expectedType] : $expectedType;
 
-        if ($type === $expected) {
-            return $type;
+        if ($valueType === $expectedType) {
+            return $valueType;
         }
 
-        if ($expected && array_key_exists($expected, $alias) && $alias[$expected] === $type) {
-            return $type;
-        }
-
-        $downcasts = [
-            'float' => ['double', 'integer'],
+        $casts = [
+            'integer' => [
+                'type' => 'numeric',
+                'strict' => [],
+                'compatible' => ['string'],
+            ],
+            'float' => [
+                'type' => 'numeric',
+                'strict' => ['double', 'integer'],
+                'compatible' => ['string'],
+            ],
+            'boolean' => [
+                'type' => 'boolean',
+                'strict' => [],
+                'compatible' => ['string'],
+            ],
+            'string' => [
+                'type' => 'string',
+                'strict' => [],
+                'compatible' => ['integer', 'float', 'boolean'],
+            ],
         ];
 
-        // allow some casting, in particular around floats...
-        if ($expected && array_key_exists($expected, $downcasts) && in_array($type, $downcasts[$expected])) {
-            return $expected;
+        if (array_key_exists($expectedType, $casts)) {
+            $cast = $casts[$expectedType];
+
+            $castTypes = $strictTypes ? ['strict'] : ['strict', 'compatible'];
+
+            foreach ($castTypes as $castType) {
+                if (in_array($valueType, $cast[$castType])) {
+                    switch ($cast['type']) {
+                        case 'numeric':
+                            if (is_numeric($value)) {
+                                return $expectedType;
+                            }
+                            break;
+
+                        case 'boolean':
+                            if (is_bool($value) || is_numeric($value)) {
+                                return $expectedType;
+                            }
+                            break;
+
+                        case 'string':
+                            return $expectedType;
+                    }
+                }
+            }
         }
 
         return null;
