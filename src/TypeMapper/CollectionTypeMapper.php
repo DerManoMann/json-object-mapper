@@ -11,6 +11,8 @@
 
 namespace Radebatz\ObjectMapper\TypeMapper;
 
+use Radebatz\ObjectMapper\ObjectMapper;
+use Radebatz\ObjectMapper\ObjectMapperException;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
@@ -23,6 +25,10 @@ class CollectionTypeMapper extends AbstractTypeMapper
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null, $key = null)
     {
+        if (is_scalar($value) && $this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_COLLECTIONS)) {
+            throw new ObjectMapperException(sprintf('Invalid collection value; name=%s, type=%s', $key, gettype($value)));
+        }
+
         if (!$typeReference || null === $value) {
             return $value;
         }

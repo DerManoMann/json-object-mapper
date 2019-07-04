@@ -24,25 +24,27 @@ class ScalarTypeMapper extends AbstractTypeMapper implements SimpleTypeMapperInt
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null, $key = null)
     {
+        $mappedValue = $value;
+
         if (!$typeReference) {
-            return $value;
+            return $mappedValue;
         }
 
-        if ($typeReference instanceof ScalarTypeReference && null !== $value) {
+        if ($typeReference instanceof ScalarTypeReference && null !== $mappedValue) {
             $strictTypes = $this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_TYPES);
 
-            $compatibleType = $this->getCompatibleType($value, $scalarType = $typeReference->getScalarType(), $strictTypes);
+            $compatibleType = $this->getCompatibleType($mappedValue, $scalarType = $typeReference->getScalarType(), $strictTypes);
 
             if ($strictTypes && !$compatibleType) {
                 throw new ObjectMapperException(sprintf('Incompatible data type; type=%s, expected=%s', gettype($value), $scalarType));
             }
 
-            if ($compatibleType && false === settype($value, $compatibleType)) {
+            if ($compatibleType && false === settype($mappedValue, $compatibleType)) {
                 throw new ObjectMapperException(sprintf('Incompatible data type; type=%s', gettype($value)));
             }
         }
 
-        return $value;
+        return $mappedValue;
     }
 
     protected function getCompatibleType($value, string $expectedType, bool $strictTypes = true): ?string
@@ -78,7 +80,7 @@ class ScalarTypeMapper extends AbstractTypeMapper implements SimpleTypeMapperInt
             'string' => [
                 'type' => 'string',
                 'strict' => [],
-                'compatible' => ['integer', 'float', 'boolean'],
+                'compatible' => ['integer', 'float', 'double', 'boolean'],
             ],
         ];
 

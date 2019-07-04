@@ -43,13 +43,13 @@ class JsonMapper
         => 'JsonMapper::map() requires second argument to be an object, NULL given.',
         'Incompatible data type; class=ArrayObject, json=double'
         => 'JSON property "pArrayObject" must be an array, double given',
-        'Incompatible data type; name=flArray, class=JsonMapperTest_Array, value=integer'
+        'Invalid collection value; name=flArray, type=integer'
         => 'JSON property "flArray" must be an array, integer given',
         'Unable to instantiate value object; class=\JsonMapperTest_ValueObject'
         => 'JSON property "pValueObject" must be an object, string given',
-        'Incompatible data type; name=pValueObject, class=JsonMapperTest_Object, type=string, expected=object'
+        'Incompatible data type; name=pValueObject, class=JsonMapperTest_ValueObject, type=string, expected=object'
         => 'JSON property "pValueObject" must be an object, string given',
-        'Could not determine access type for property "privatePropertyPrivateSetter" in class "PrivateWithSetter": Neither the property "privatePropertyPrivateSetter" nor one of the methods "addPrivatePropertyPrivateSetter()"/"removePrivatePropertyPrivateSetter()", "setPrivatePropertyPrivateSetter()", "privatePropertyPrivateSetter()", "__set()" or "__call()" exist and have public access in class "PrivateWithSetter"..'
+        'Unmapped property; name=privatePropertyPrivateSetter, class=PrivateWithSetter'
         => 'JSON property "privatePropertyPrivateSetter" has no public setter method in object of type PrivateWithSetter',
         'Expecting JSON to resolve to either array or object; json=, actual='
         => 'JsonMapper::map() requires first argument to be an object, NULL given.',
@@ -57,8 +57,8 @@ class JsonMapper
         => 'JSON property "pArrayObject" must be an array, double given',
         'Passed variable is not an array or object'
         => 'JSON property "pArrayObject" must be an array, double given',
-        'Collection type mismatch: expecting object or array, got double'
-        => 'JSON property "pArrayObject" must be an array, double given'
+        'Invalid collection value; name=pArrayObject, type=double'
+        => 'JSON property "pArrayObject" must be an array, double given',
     ];
     private $logMap = [
         'Unwritable property; name=protectedStrNoSetter, class=JsonMapperTest_Simple' =>
