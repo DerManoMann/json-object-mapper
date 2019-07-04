@@ -22,7 +22,7 @@ use Radebatz\ObjectMapper\TypeReferenceInterface;
  */
 class ScalarTypeMapper extends AbstractTypeMapper implements SimpleTypeMapperInterface
 {
-    public function map($value, ?TypeReferenceInterface $typeReference = null)
+    public function map($value, ?TypeReferenceInterface $typeReference = null, $key = null)
     {
         if (!$typeReference) {
             return $value;

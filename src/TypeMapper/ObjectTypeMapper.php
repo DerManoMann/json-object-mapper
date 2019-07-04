@@ -26,7 +26,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
  */
 class ObjectTypeMapper extends AbstractTypeMapper
 {
-    public function map($value, ?TypeReferenceInterface $typeReference = null)
+    public function map($value, ?TypeReferenceInterface $typeReference = null, $key = null)
     {
         if (!$typeReference || null === $value) {
             return $value;
@@ -50,6 +50,10 @@ class ObjectTypeMapper extends AbstractTypeMapper
             $obj = $this->instantiate($value, $resolvedTypeClassName);
         } else {
             throw new ObjectMapperException(sprintf('Unexpected type reference: %s', get_class($typeReference)));
+        }
+
+        if (!is_object($value) && $this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_TYPES)) {
+            throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=object', $key, $resolvedTypeClassName), gettype($value));
         }
 
         // keep track of mapped properties in case we want to verify required ones later
@@ -111,6 +115,6 @@ class ObjectTypeMapper extends AbstractTypeMapper
 
         $valueTypeMapper = $this->getObjectMapper()->getTypeMapper($val, $valueTypeReference);
 
-        return $valueTypeMapper->map($val, $valueTypeReference);
+        return $valueTypeMapper->map($val, $valueTypeReference, $key);
     }
 }

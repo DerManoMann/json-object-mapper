@@ -16,5 +16,5 @@ namespace Radebatz\ObjectMapper;
  */
 interface TypeMapperInterface
 {
-    public function map($value, ?TypeReferenceInterface $typeReference = null);
+    public function map($value, ?TypeReferenceInterface $typeReference = null, $key = null);
 }

@@ -18,7 +18,7 @@ use Radebatz\ObjectMapper\TypeReferenceInterface;
  */
 class DateTimeTypeMapper extends AbstractTypeMapper
 {
-    public function map($value, ?TypeReferenceInterface $typeReference = null)
+    public function map($value, ?TypeReferenceInterface $typeReference = null, $key = null)
     {
         if (!is_scalar($value)) {
             throw new \InvalidArgumentException('Expecting scalar value');

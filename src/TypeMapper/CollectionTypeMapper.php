@@ -21,7 +21,7 @@ use Radebatz\ObjectMapper\TypeReferenceInterface;
  */
 class CollectionTypeMapper extends AbstractTypeMapper
 {
-    public function map($value, ?TypeReferenceInterface $typeReference = null)
+    public function map($value, ?TypeReferenceInterface $typeReference = null, $key = null)
     {
         if (!$typeReference || null === $value) {
             return $value;
@@ -51,7 +51,7 @@ class CollectionTypeMapper extends AbstractTypeMapper
         foreach ((array) $value as $key => $val) {
             if ($valueType instanceof TypeReferenceInterface) {
                 $mapper = $this->getObjectMapper()->getTypeMapper($val, $valueType);
-                $val = $mapper->map($val, $valueType);
+                $val = $mapper->map($val, $valueType, $key);
             }
 
             if ($obj instanceof \ArrayAccess) {

@@ -19,7 +19,7 @@ use Radebatz\ObjectMapper\TypeReferenceInterface;
  */
 class NoopTypeMapper extends AbstractTypeMapper implements SimpleTypeMapperInterface
 {
-    public function map($value, ?TypeReferenceInterface $typeReference = null)
+    public function map($value, ?TypeReferenceInterface $typeReference = null, $key = null)
     {
         return $value;
     }
