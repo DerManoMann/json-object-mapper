@@ -17,7 +17,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Radebatz\ObjectMapper\ObjectMapper;
 
 class TestCase extends BaseTestCase

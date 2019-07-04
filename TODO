@@ -4,3 +4,5 @@
 * failing tests in JsonMapper wrapper
 * fully flesh out magic method phpdoc support (partially implemented)
 * extended phpdoc type hint support; for example, JsonMapper supports `/** @var array[string] */`
+* (fully?) implement && tests for OPTION_STRICT_NULL
+* implement && tests for OPTION_STRICT_COLLECTIONS

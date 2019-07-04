@@ -33,6 +33,14 @@ class ObjectTypeReference implements TypeReferenceInterface
         return $this->obj instanceof \ArrayObject;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function isNullable()
+    {
+        return true;
+    }
+
     public function getObject()
     {
         return $this->obj;

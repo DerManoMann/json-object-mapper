@@ -16,7 +16,7 @@ use Psr\Log\NullLogger;
 use Radebatz\ObjectMapper\NamingMapper\NoopNamingMapper;
 use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\TypeMapper\CollectionTypeMapper;
-use Radebatz\ObjectMapper\TypeMapper\DefaultObjectTypeMapper;
+use Radebatz\ObjectMapper\TypeMapper\ObjectTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\NoopTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\ScalarTypeMapper;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
@@ -34,7 +34,6 @@ class ObjectMapper
     public const OPTION_STRICT_TYPES = 'strictTypes';
     // TODO: implement */
     public const OPTION_STRICT_COLLECTIONS = 'strictCollections';
-    // TODO: implement */
     public const OPTION_STRICT_NULL = 'strictNull';
     public const OPTION_IGNORE_UNKNOWN = 'ignoreUnknown';
     public const OPTION_VERIFY_REQUIRED = 'verifyRequired';
@@ -200,6 +199,8 @@ class ObjectMapper
     /**
      * Map a given (complex) value onto a new/different type.
      *
+     * `$type` may be `null` if the given `$value` is a scalar.
+     *
      * @param mixed                                     $value   the value
      * @param null|string|object|TypeReferenceInterface $type    the target type
      * @param bool                                      $encoded if set to true, `string` values will be json_decoded; defaults to `true`
@@ -215,6 +216,10 @@ class ObjectMapper
         }
 
         $mapper = $this->getTypeMapper($value, $type);
+
+        if (null === $type && !($mapper instanceof SimpleTypeMapperInterface)) {
+            throw new \InvalidArgumentException('Type must not be null');
+        }
 
         return $mapper->map($value, $type);
     }
@@ -248,7 +253,7 @@ class ObjectMapper
                 // no break
 
                 default:
-                    return new DefaultObjectTypeMapper($this);
+                    return new ObjectTypeMapper($this);
             }
         }
 

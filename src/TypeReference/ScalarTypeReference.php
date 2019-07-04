@@ -35,6 +35,9 @@ class ScalarTypeReference implements TypeReferenceInterface
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function isNullable()
     {
         return $this->nullable;

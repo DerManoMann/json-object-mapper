@@ -19,10 +19,12 @@ use Radebatz\ObjectMapper\TypeReferenceInterface;
 class ClassTypeReference implements TypeReferenceInterface
 {
     protected $className;
+    protected $nullable;
 
-    public function __construct(string $className)
+    public function __construct(string $className, bool $nullable = true)
     {
         $this->className = $className;
+        $this->nullable = $nullable;
     }
 
     /**
@@ -31,6 +33,14 @@ class ClassTypeReference implements TypeReferenceInterface
     public function isCollection(): bool
     {
         return \ArrayObject::class == $this->className || is_subclass_of($this->className, \ArrayObject::class);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isNullable()
+    {
+        return $this->nullable;
     }
 
     public function getClassName(): string

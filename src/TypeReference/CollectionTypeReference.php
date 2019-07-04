@@ -22,15 +22,17 @@ class CollectionTypeReference implements TypeReferenceInterface
 {
     protected $valueType;
     protected $collectionType = null;
+    protected $nullable;
 
     /**
      * @param string|ClassTypeReference $valueType      String values are taken as build in data type
      * @param string                    $collectionType Collection class name
      */
-    public function __construct($valueType, $collectionType = null)
+    public function __construct($valueType, $collectionType = null, bool $nullable = true)
     {
         $this->valueType = $valueType;
         $this->collectionType = $collectionType;
+        $this->nullable = $nullable;
     }
 
     /**
@@ -39,6 +41,14 @@ class CollectionTypeReference implements TypeReferenceInterface
     public function isCollection(): bool
     {
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isNullable()
+    {
+        return $this->nullable;
     }
 
     public function getValueType()

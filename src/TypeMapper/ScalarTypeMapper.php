@@ -13,13 +13,14 @@ namespace Radebatz\ObjectMapper\TypeMapper;
 
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
+use Radebatz\ObjectMapper\SimpleTypeMapperInterface;
 use Radebatz\ObjectMapper\TypeReference\ScalarTypeReference;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
 
 /**
  * Maps a scalar including type juggling.
  */
-class ScalarTypeMapper extends AbstractTypeMapper
+class ScalarTypeMapper extends AbstractTypeMapper implements SimpleTypeMapperInterface
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null)
     {

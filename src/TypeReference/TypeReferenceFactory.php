@@ -21,14 +21,14 @@ class TypeReferenceFactory
     public static function getTypeReferenceForType(Type $type)
     {
         if ($className = $type->getClassName()) {
-            return new ClassTypeReference($className);
+            return new ClassTypeReference($className, $type->isNullable());
         }
 
         if ($buildInType = $type->getBuiltinType()) {
             switch ($buildInType) {
                 case Type::BUILTIN_TYPE_ARRAY:
                     // TODO: collection key type
-                    return new CollectionTypeReference(self::getTypeReferenceForType($type->getCollectionValueType()));
+                    return new CollectionTypeReference(self::getTypeReferenceForType($type->getCollectionValueType()), null, $type->isNullable());
 
                 case Type::BUILTIN_TYPE_INT:
                 case Type::BUILTIN_TYPE_FLOAT:

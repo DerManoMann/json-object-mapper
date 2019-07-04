@@ -11,12 +11,13 @@
 
 namespace Radebatz\ObjectMapper\TypeMapper;
 
+use Radebatz\ObjectMapper\SimpleTypeMapperInterface;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
 
 /**
  * No-op mapper.
  */
-class NoopTypeMapper extends AbstractTypeMapper
+class NoopTypeMapper extends AbstractTypeMapper implements SimpleTypeMapperInterface
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null)
     {

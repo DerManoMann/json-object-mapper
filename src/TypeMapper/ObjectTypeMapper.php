@@ -22,9 +22,9 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 /**
- * Default object type mapper.
+ * Generic object type mapper.
  */
-class DefaultObjectTypeMapper extends AbstractTypeMapper
+class ObjectTypeMapper extends AbstractTypeMapper
 {
     public function map($value, ?TypeReferenceInterface $typeReference = null)
     {
@@ -42,6 +42,10 @@ class DefaultObjectTypeMapper extends AbstractTypeMapper
             $typeClassName = $typeReference->getClassName();
 
             $resolvedTypeClassName = $this->resolveValueType($typeClassName, $value);
+
+            if (is_object($value) && $value instanceof $resolvedTypeClassName) {
+                return $value;
+            }
 
             $obj = $this->instantiate($value, $resolvedTypeClassName);
         } else {
@@ -98,6 +102,11 @@ class DefaultObjectTypeMapper extends AbstractTypeMapper
         $valueTypeReference = null;
         if ($types = $propertyInfoExtractor->getTypes(get_class($obj), $key)) {
             $valueTypeReference = TypeReferenceFactory::getTypeReferenceForType($types[0]);
+        }
+
+        if (null === $val && $valueTypeReference && !$valueTypeReference->isNullable()
+            && $this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_NULL)) {
+            throw new ObjectMapperException(sprintf('Unmappable null value; name=%s, class=%s', $key, get_class($obj)));
         }
 
         $valueTypeMapper = $this->getObjectMapper()->getTypeMapper($val, $valueTypeReference);

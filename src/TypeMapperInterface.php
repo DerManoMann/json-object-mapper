@@ -12,7 +12,7 @@
 namespace Radebatz\ObjectMapper;
 
 /**
- * Maps a single data type to an (optional) target type.
+ * Maps a single data type to a target type.
  */
 interface TypeMapperInterface
 {

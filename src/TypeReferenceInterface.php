@@ -17,4 +17,6 @@ namespace Radebatz\ObjectMapper;
 interface TypeReferenceInterface
 {
     public function isCollection(): bool;
+
+    public function isNullable();
 }
