@@ -2,6 +2,8 @@
 A simple library to deserialize JSON into (nested) PHP  arrays / objects.
 
 [![Build Status](https://travis-ci.org/DerManoMann/json-object-mapper.png)](https://travis-ci.org/DerManoMann/json-object-mapper)
+[![Coverage Status](https://coveralls.io/repos/DerManoMann/json-object-mapper/badge.png)](https://coveralls.io/r/DerManoMann/json-object-mapper)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Requirements ##
 * [PHP 7.1 or higher](http://www.php.net/)
