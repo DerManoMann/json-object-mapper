@@ -185,6 +185,13 @@ class JsonMapper
 
     public function map($json, $object)
     {
+        if (null === $json) {
+            throw new \InvalidArgumentException('JsonMapper::map() requires first argument to be an object, NULL given.');
+        }
+        if (null === $object) {
+            throw new \InvalidArgumentException('JsonMapper::map() requires second argument to be an object, NULL given.');
+        }
+
         try {
             return $this->getObjectMapper()->map($json, $object);
         } catch (ObjectMapperException $e) {
