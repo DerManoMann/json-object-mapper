@@ -45,7 +45,7 @@ class NamingMapperTest extends TestCase
     public function camelNames()
     {
         return [
-            ['start_middle_last', 'startMiddleLast', ],
+            ['start_middle_last', 'startMiddleLast'],
             ['simple_xml', 'simpleXml'],
             ['PDF_load', 'pdfLoad'],
             ['simple_TEST', 'simpleTest'],

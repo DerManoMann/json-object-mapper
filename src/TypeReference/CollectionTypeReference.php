@@ -36,7 +36,7 @@ class CollectionTypeReference implements TypeReferenceInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isCollection(): bool
     {
@@ -44,7 +44,7 @@ class CollectionTypeReference implements TypeReferenceInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isNullable()
     {
