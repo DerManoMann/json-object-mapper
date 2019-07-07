@@ -36,8 +36,8 @@
     "require": {
         "php": ">=7.1",
         "ext-json": "*",
-        "symfony/property-info": "^3.4.13|^4.1",
-        "phpdocumentor/reflection-docblock": "^4.0",
+        "symfony/property-info": "^4.2",
+        "phpdocumentor/reflection-docblock": "^4.3",
         "symfony/property-access": "^3.4|^4.0",
         "psr/log": "^1.0"
     },
