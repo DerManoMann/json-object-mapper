@@ -46,6 +46,7 @@
         "friendsofphp/php-cs-fixer": "^2.11",
         "monolog/monolog": "^1.23",
         "netresearch/jsonmapper": "^1.4",
-        "php-coveralls/php-coveralls": "^2.1"
+        "php-coveralls/php-coveralls": "^2.1",
+        "phpunit/php-code-coverage": "^6.1|^7.0.5"
     }
 }
