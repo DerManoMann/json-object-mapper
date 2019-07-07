@@ -19,6 +19,7 @@ env:
 
 before_install:
   - composer self-update
+  - if [[ $TRAVIS_PHP_VERSION != 7.3 or $PREFER_LOWEST  != "" ]] ; then phpenv config-rm xdebug.ini; fi;
 
 install:
   - travis_retry composer update --no-interaction $PREFER_LOWEST --prefer-source
@@ -28,7 +29,7 @@ script:
   - if [[ $TRAVIS_PHP_VERSION < 7.4 ]] ; then composer run-script fix-cs; fi;
 
 after_script:
-  - php vendor/bin/php-coveralls -v
+  - if [[ $TRAVIS_PHP_VERSION = 7.3 and $PREFER_LOWEST  = "" ]] ; then php vendor/bin/php-coveralls -v; fi;
 
 matrix:
   allow_failures:
