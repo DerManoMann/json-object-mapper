@@ -118,7 +118,7 @@ rm -rf vendor/netresearch/jsonmapper && composer install --prefer-source
 Not all tests pass as this library support also, for example, mapping scalar values. As it stands the result of running the tests is:
 
 ```$sh
-Tests: 84, Assertions: 209, Errors: 2, Failures: 11.
+Tests: 84, Assertions: 209, Errors: 4, Failures: 14.
 ```
 
 The tests use a custom [`JsonMapper`](tests/JsonMapper/JsonMapper.php) class that internally uses the `ObjectMapper`.
