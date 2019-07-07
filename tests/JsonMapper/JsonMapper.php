@@ -59,6 +59,12 @@ class JsonMapper
         => 'JSON property "pArrayObject" must be an array, double given',
         'Invalid collection value; name=pArrayObject, type=double'
         => 'JSON property "pArrayObject" must be an array, double given',
+        'Could not determine access type for property "privatePropertyPrivateSetter" in class "PrivateWithSetter": Neither the property "privatePropertyPrivateSetter" nor one of the methods "addPrivatePropertyPrivateSetter()"/"removePrivatePropertyPrivateSetter()", "setPrivatePropertyPrivateSetter()", "privatePropertyPrivateSetter()", "__set()" or "__call()" exist and have public access in class "PrivateWithSetter".'
+        => 'JSON property "privatePropertyPrivateSetter" has no public setter method in object of type PrivateWithSetter',
+        'Incompatible data type; key=0, type=object, expected=string'
+        => 'JSON property "strArray" is an array of type "string" but contained a value of type "object"',
+        'Incompatible data type; key=pString, type=object, expected=string'
+        => 'JSON property "pString" in class "JsonMapperTest_Object" is an object and cannot be converted to a string',
     ];
     private $logMap = [
         'Unwritable property; name=protectedStrNoSetter, class=JsonMapperTest_Simple' =>

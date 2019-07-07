@@ -35,12 +35,12 @@ class ScalarTypeMapper extends AbstractTypeMapper implements SimpleTypeMapperInt
 
             $compatibleType = $this->getCompatibleType($mappedValue, $scalarType = $typeReference->getScalarType(), $strictTypes);
 
-            if ($strictTypes && !$compatibleType) {
-                throw new ObjectMapperException(sprintf('Incompatible data type; type=%s, expected=%s', gettype($value), $scalarType));
+            if (($strictTypes && !$compatibleType) || !is_scalar($mappedValue)) {
+                throw new ObjectMapperException(sprintf('Incompatible data type; key=%s, type=%s, expected=%s', $key, gettype($value), $scalarType));
             }
 
             if ($compatibleType && false === settype($mappedValue, $compatibleType)) {
-                throw new ObjectMapperException(sprintf('Incompatible data type; type=%s', gettype($value)));
+                throw new ObjectMapperException(sprintf('Incompatible data type; key=%s, type=%s', $key, gettype($value)));
             }
         }
 

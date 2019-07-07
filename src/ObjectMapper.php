@@ -32,7 +32,6 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 class ObjectMapper
 {
     public const OPTION_STRICT_TYPES = 'strictTypes';
-    // TODO: implement */
     public const OPTION_STRICT_COLLECTIONS = 'strictCollections';
     public const OPTION_STRICT_NULL = 'strictNull';
     public const OPTION_IGNORE_UNKNOWN = 'ignoreUnknown';
@@ -242,8 +241,6 @@ class ObjectMapper
                     return new CollectionTypeMapper($this);
 
                 case ClassTypeReference::class:
-                    // TODO: resolve class mapping?
-
                     /** @var ClassTypeReference $typeReference */
                     $className = $typeReference->getClassName();
                     $classInterfaces = class_implements($className);
