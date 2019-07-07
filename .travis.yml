@@ -17,18 +17,19 @@ env:
     - PREFER_LOWEST="--prefer-lowest --prefer-stable"
     - PREFER_LOWEST=""
 
+before_install:
+  - composer self-update
+
 install:
-  - travis_retry composer install --no-interaction --prefer-source
+  - travis_retry composer update --no-interaction $PREFER_LOWEST --prefer-source
 
 script:
   - ./vendor/bin/phpunit
-  #- ./vendor/bin/phpunit -c phpunit.xml.jsonmapper
   - if [[ $TRAVIS_PHP_VERSION < 7.4 ]] ; then composer run-script fix-cs; fi;
 
-  after_script:
-    - php vendor/bin/php-coveralls -v
+after_script:
+  - php vendor/bin/php-coveralls -v
 
-  matrix:
-    allow_failures:
-      - php: 7.4snapshot
-      - php: nightly
+matrix:
+  allow_failures:
+    - php: nightly
