@@ -211,6 +211,9 @@ class ObjectMapper
         }
 
         if ($type && !($type instanceof TypeReferenceInterface)) {
+            if (!is_string($type) && !is_object($type)) {
+                throw new \InvalidArgumentException(sprintf('Invalid type: %s', gettype($type)));
+            }
             $type = is_object($type) ? new ObjectTypeReference($type) : new ClassTypeReference($type);
         }
 
