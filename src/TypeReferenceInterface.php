@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
 * This file is part of the ObjectMapper library.
@@ -11,11 +9,14 @@ declare(strict_types=1);
 * file that was distributed with this source code.
 */
 
-namespace Radebatz\ObjectMapper\TypeReference;
+namespace Radebatz\ObjectMapper;
 
 /**
- * Allows to define more complex data types for the value object.
+ * Type declaration.
  */
 interface TypeReferenceInterface
 {
+    public function isCollection(): bool;
+
+    public function isNullable();
 }

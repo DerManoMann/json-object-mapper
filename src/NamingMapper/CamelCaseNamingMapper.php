@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\NamingMapper;
 
+use Radebatz\ObjectMapper\NamingMapperInterface;
+
 /**
  * Map property names to camel case.
  */
@@ -27,7 +29,7 @@ class CamelCaseNamingMapper implements NamingMapperInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function resolve($name)
     {
@@ -52,6 +54,6 @@ class CamelCaseNamingMapper implements NamingMapperInterface
             return ucfirst(strtolower($word));
         }, $words)));
 
-        return ($this->cache[$name] = ($camelKey !== $name ? $camelKey : null));
+        return $this->cache[$name] = ($camelKey !== $name ? $camelKey : null);
     }
 }

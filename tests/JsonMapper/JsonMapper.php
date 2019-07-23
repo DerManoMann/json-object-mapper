@@ -4,9 +4,9 @@ use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
 use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
-use Radebatz\ObjectMapper\TypeMapper\TypeMapperInterface;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
+use Radebatz\ObjectMapper\ValueTypeResolverInterface;
 
 class JsonMapper
 {
@@ -43,13 +43,13 @@ class JsonMapper
         => 'JsonMapper::map() requires second argument to be an object, NULL given.',
         'Incompatible data type; class=ArrayObject, json=double'
         => 'JSON property "pArrayObject" must be an array, double given',
-        'Incompatible data type; name=flArray, class=JsonMapperTest_Array, value=integer'
+        'Invalid collection value; name=flArray, type=integer'
         => 'JSON property "flArray" must be an array, integer given',
         'Unable to instantiate value object; class=\JsonMapperTest_ValueObject'
         => 'JSON property "pValueObject" must be an object, string given',
-        'Incompatible data type; name=pValueObject, class=JsonMapperTest_Object, type=string, expected=object'
+        'Incompatible data type; name=pValueObject, class=JsonMapperTest_ValueObject, type=string, expected=object'
         => 'JSON property "pValueObject" must be an object, string given',
-        'Could not determine access type for property "privatePropertyPrivateSetter" in class "PrivateWithSetter": Neither the property "privatePropertyPrivateSetter" nor one of the methods "addPrivatePropertyPrivateSetter()"/"removePrivatePropertyPrivateSetter()", "setPrivatePropertyPrivateSetter()", "privatePropertyPrivateSetter()", "__set()" or "__call()" exist and have public access in class "PrivateWithSetter"..'
+        'Unmapped property; name=privatePropertyPrivateSetter, class=PrivateWithSetter'
         => 'JSON property "privatePropertyPrivateSetter" has no public setter method in object of type PrivateWithSetter',
         'Expecting JSON to resolve to either array or object; json=, actual='
         => 'JsonMapper::map() requires first argument to be an object, NULL given.',
@@ -57,8 +57,14 @@ class JsonMapper
         => 'JSON property "pArrayObject" must be an array, double given',
         'Passed variable is not an array or object'
         => 'JSON property "pArrayObject" must be an array, double given',
-        'Collection type mismatch: expecting object or array, got double'
-        => 'JSON property "pArrayObject" must be an array, double given'
+        'Invalid collection value; name=pArrayObject, type=double'
+        => 'JSON property "pArrayObject" must be an array, double given',
+        'Could not determine access type for property "privatePropertyPrivateSetter" in class "PrivateWithSetter": Neither the property "privatePropertyPrivateSetter" nor one of the methods "addPrivatePropertyPrivateSetter()"/"removePrivatePropertyPrivateSetter()", "setPrivatePropertyPrivateSetter()", "privatePropertyPrivateSetter()", "__set()" or "__call()" exist and have public access in class "PrivateWithSetter".'
+        => 'JSON property "privatePropertyPrivateSetter" has no public setter method in object of type PrivateWithSetter',
+        'Incompatible data type; key=0, type=object, expected=string'
+        => 'JSON property "strArray" is an array of type "string" but contained a value of type "object"',
+        'Incompatible data type; key=pString, type=object, expected=string'
+        => 'JSON property "pString" in class "JsonMapperTest_Object" is an object and cannot be converted to a string',
     ];
     private $logMap = [
         'Unwritable property; name=protectedStrNoSetter, class=JsonMapperTest_Simple' =>
@@ -155,7 +161,7 @@ class JsonMapper
         $objectMapper->addNamingMapper(new SnakeCaseNamingMapper());
 
         foreach ($this->classMap as $class => $mapped) {
-            $mapper = new class() implements TypeMapperInterface {
+            $valueTypeResolver = new class() implements ValueTypeResolverInterface {
                 public $class;
                 public $mapped = null;
                 public $resolver = null;
@@ -174,10 +180,10 @@ class JsonMapper
                 }
             };
 
-            $mapper->class = $class;
-            $mapper->mapped = is_callable($mapped) ? null : $mapped;
-            $mapper->resolver = is_callable($mapped) ? $mapped : null;
-            $objectMapper->addTypeMapper($mapper);
+            $valueTypeResolver->class = $class;
+            $valueTypeResolver->mapped = is_callable($mapped) ? null : $mapped;
+            $valueTypeResolver->resolver = is_callable($mapped) ? $mapped : null;
+            $objectMapper->addValueTypeResolver($valueTypeResolver);
         }
 
         return $objectMapper;
@@ -185,6 +191,13 @@ class JsonMapper
 
     public function map($json, $object)
     {
+        if (null === $json) {
+            throw new \InvalidArgumentException('JsonMapper::map() requires first argument to be an object, NULL given.');
+        }
+        if (null === $object) {
+            throw new \InvalidArgumentException('JsonMapper::map() requires second argument to be an object, NULL given.');
+        }
+
         try {
             return $this->getObjectMapper()->map($json, $object);
         } catch (ObjectMapperException $e) {
@@ -197,7 +210,7 @@ class JsonMapper
     public function mapArray($json, $array, $class = null)
     {
         try {
-            return $this->getObjectMapper()->map((object) $json, ($class ? new CollectionTypeReference($class) : new ObjectTypeReference(new \ArrayObject())))->getArrayCopy();
+            return $this->getObjectMapper()->map((object) $json, ($class ? new CollectionTypeReference($class, \ArrayObject::class) : new ObjectTypeReference(new \ArrayObject())))->getArrayCopy();
         } catch (ObjectMapperException $e) {
             throw $this->getJsonMapperException($e);
         } catch (\InvalidArgumentException $e) {

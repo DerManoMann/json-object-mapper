@@ -19,7 +19,7 @@ use Radebatz\ObjectMapper\PropertyInfo\PhpDocMagicExtractor;
 class MagicPopoTest extends TestCase
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function setUp()
     {

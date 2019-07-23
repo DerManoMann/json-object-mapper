@@ -21,12 +21,15 @@ class DataTypeTest extends TestCase
     public function json()
     {
         return [
-            ['{"proString":false}', true, true],
-            ['{"proInt":1,"proBool":false}', true, false],
-            ['{"proInt":"abc"}', true, true],
-            ['{"proString":false}', false, false],
-            ['{"proInt":1,"proBool":false}', false, false],
-            ['{"proInt":"abc"}', false, false],
+            'bool-as-string-strict-fail' => ['{"proString":false}', true, true],
+            'bool-as-string-ok' => ['{"proString":false}', false, false],
+            'int-bool-types-strict-ok' => ['{"proInt":1,"proBool":false}', true, false],
+            'int-bool-types-ok' => ['{"proInt":1,"proBool":false}', false, false],
+            'string-as-int-strict-fail' => ['{"proInt":"abc"}', true, true],
+            'string-as-int-fail' => ['{"proInt":"abc"}', false, true], // fails due to strict typing
+            'weak-typed-int-strict-ok' => ['{"weakTyped":1}', true, false],
+            'weak-typed-string-strict-fail' => ['{"weakTyped":"abc"}', true, true],
+            'weak-typed-string-ok' => ['{"weakTyped":"abc"}', false, false],
         ];
     }
 
@@ -40,11 +43,11 @@ class DataTypeTest extends TestCase
         ]);
 
         try {
-            $popo = $objectMapper->map($json, Models\SimplePopo::class);
+            $objectMapper->map($json, Models\SimplePopo::class);
 
             $this->assertFalse($fail, '*Expected* to fail');
         } catch (ObjectMapperException $e) {
-            $this->assertTrue($fail, 'Expected *NOT* to fail');
+            $this->assertTrue($fail, sprintf('Expected *NOT* to fail: %s', $e->getMessage()));
         }
     }
 }

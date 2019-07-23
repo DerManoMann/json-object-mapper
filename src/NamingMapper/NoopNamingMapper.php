@@ -13,13 +13,15 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\NamingMapper;
 
+use Radebatz\ObjectMapper\NamingMapperInterface;
+
 /**
  * No-op naming mapper - this is the default.
  */
 class NoopNamingMapper implements NamingMapperInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function resolve($name)
     {

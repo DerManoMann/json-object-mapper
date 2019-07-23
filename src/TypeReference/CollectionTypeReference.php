@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /*
 * This file is part of the ObjectMapper library.
@@ -13,24 +11,44 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\TypeReference;
 
+use Radebatz\ObjectMapper\TypeReferenceInterface;
+
 /**
- * Type reference to map data into a list/map with custom collection type classes allowed.
+ * Type reference tfor collections.
  *
- * Custom collection types are expected to have a constructor that accepts the collection data.
+ * A `collectionType` value of `null` will be resolved as simple `array` / `[]`.
  */
 class CollectionTypeReference implements TypeReferenceInterface
 {
     protected $valueType;
-    protected $collectionType;
+    protected $collectionType = null;
+    protected $nullable;
 
     /**
      * @param string|ClassTypeReference $valueType      String values are taken as build in data type
-     * @param string                    $collectionType
+     * @param string                    $collectionType Collection class name
      */
-    public function __construct($valueType = null, $collectionType = null)
+    public function __construct($valueType, $collectionType = null, bool $nullable = true)
     {
-        $this->setValueType($valueType);
-        $this->setCollectionType($collectionType);
+        $this->valueType = $valueType;
+        $this->collectionType = $collectionType;
+        $this->nullable = $nullable;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isCollection(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isNullable()
+    {
+        return $this->nullable;
     }
 
     public function getValueType()
@@ -38,18 +56,8 @@ class CollectionTypeReference implements TypeReferenceInterface
         return $this->valueType;
     }
 
-    public function setValueType($valueType)
-    {
-        $this->valueType = $valueType;
-    }
-
-    public function getCollectionType()
+    public function getCollectionType(): ?string
     {
         return $this->collectionType;
-    }
-
-    public function setCollectionType($collectionType)
-    {
-        $this->collectionType = $collectionType ?: \ArrayObject::class;
     }
 }

@@ -14,16 +14,16 @@ namespace Radebatz\ObjectMapper\TypeReference;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
 
 /**
- * Type reference to map into a new instance of `$className`.
+ * Scalar type reference.
  */
-class ClassTypeReference implements TypeReferenceInterface
+class ScalarTypeReference implements TypeReferenceInterface
 {
-    protected $className;
+    protected $scalarType;
     protected $nullable;
 
-    public function __construct(string $className, bool $nullable = true)
+    public function __construct(string $scalarType, bool $nullable)
     {
-        $this->className = $className;
+        $this->scalarType = $scalarType;
         $this->nullable = $nullable;
     }
 
@@ -32,7 +32,7 @@ class ClassTypeReference implements TypeReferenceInterface
      */
     public function isCollection(): bool
     {
-        return \ArrayObject::class == $this->className || is_subclass_of($this->className, \ArrayObject::class);
+        return false;
     }
 
     /**
@@ -43,13 +43,13 @@ class ClassTypeReference implements TypeReferenceInterface
         return $this->nullable;
     }
 
-    public function getClassName(): string
+    public function getScalarType(): string
     {
-        return $this->className;
+        return $this->scalarType;
     }
 
-    public function setClassName(string $className)
+    public function setScalarType(string $scalarType)
     {
-        $this->className = $className;
+        $this->scalarType = $scalarType;
     }
 }

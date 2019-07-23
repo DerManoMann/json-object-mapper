@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\NamingMapper;
 
+use Radebatz\ObjectMapper\NamingMapperInterface;
+
 /**
  * Map property names to snake case.
  */
@@ -21,7 +23,7 @@ class SnakeCaseNamingMapper implements NamingMapperInterface
     protected $cache = [];
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function resolve($name)
     {
@@ -34,7 +36,7 @@ class SnakeCaseNamingMapper implements NamingMapperInterface
         }
 
         if (strtoupper($name) === $name) {
-            return ($this->cache[$name] = strtolower($name));
+            return $this->cache[$name] = strtolower($name);
         }
 
         $snakeKey = $name;
@@ -49,6 +51,6 @@ class SnakeCaseNamingMapper implements NamingMapperInterface
         }, $snakeKey);
         $snakeKey = ltrim(str_replace('__', '_', strtolower($snakeKey)), '_');
 
-        return ($this->cache[$name] = ($snakeKey !== $name ? $snakeKey : null));
+        return $this->cache[$name] = ($snakeKey !== $name ? $snakeKey : null);
     }
 }

@@ -21,6 +21,8 @@ use Radebatz\ObjectMapper\ObjectMapper;
 
 class TestCase extends BaseTestCase
 {
+    protected $objectMappers = [];
+
     /**
      * @throws \Exception
      */

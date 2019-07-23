@@ -2,6 +2,8 @@
 A simple library to deserialize JSON into (nested) PHP  arrays / objects.
 
 [![Build Status](https://travis-ci.org/DerManoMann/json-object-mapper.png)](https://travis-ci.org/DerManoMann/json-object-mapper)
+[![Coverage Status](https://coveralls.io/repos/github/DerManoMann/json-object-mapper/badge.svg)](https://coveralls.io/github/DerManoMann/json-object-mapper)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Requirements ##
 * [PHP 7.1 or higher](http://www.php.net/)
@@ -112,3 +114,11 @@ For this you run:
 rm -rf vendor/netresearch/jsonmapper && composer install --prefer-source
 ./vendor/bin/phpunit -c phpunit.xml.jsonmapper
 ```` 
+
+Not all tests pass as this library support also, for example, mapping scalar values. As it stands the result of running the tests is:
+
+```$sh
+Tests: 96, Assertions: 222, Errors: 4, Failures: 12.
+```
+
+The tests use a custom [`JsonMapper`](tests/JsonMapper/JsonMapper.php) class that internally uses the `ObjectMapper`.

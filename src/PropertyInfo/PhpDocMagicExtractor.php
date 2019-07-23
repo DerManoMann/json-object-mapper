@@ -28,16 +28,13 @@ class PhpDocMagicExtractor implements PropertyListExtractorInterface, PropertyTy
     /** @var string[] */
     protected $properties = [];
 
-    /**
-     * @param DocBlockCache $dockBlockCache
-     */
     public function __construct(DocBlockCache $dockBlockCache)
     {
         $this->dockBlockCache = $dockBlockCache;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getProperties($class, array $context = [])
     {
@@ -67,7 +64,7 @@ class PhpDocMagicExtractor implements PropertyListExtractorInterface, PropertyTy
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTypes($class, $property, array $context = [])
     {
