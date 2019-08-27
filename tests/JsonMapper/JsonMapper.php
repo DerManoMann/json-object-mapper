@@ -4,6 +4,7 @@ use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
 use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
+use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\ValueTypeResolverInterface;
@@ -210,7 +211,13 @@ class JsonMapper
     public function mapArray($json, $array, $class = null)
     {
         try {
-            return $this->getObjectMapper()->map((object) $json, ($class ? new CollectionTypeReference($class, \ArrayObject::class) : new ObjectTypeReference(new \ArrayObject())))->getArrayCopy();
+            return $this->getObjectMapper()->map(
+                (object) $json,
+                ($class ?
+                    new CollectionTypeReference(new ClassTypeReference($class), \ArrayObject::class)
+                    : new ObjectTypeReference(new \ArrayObject())
+                )
+            )->getArrayCopy();
         } catch (ObjectMapperException $e) {
             throw $this->getJsonMapperException($e);
         } catch (\InvalidArgumentException $e) {

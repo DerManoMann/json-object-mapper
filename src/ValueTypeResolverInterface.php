@@ -22,7 +22,7 @@ interface ValueTypeResolverInterface
      * @param string       $className The class/interface name to map
      * @param array|object $json      The data to deserialize
      *
-     * @return string|null A instantiable class name
+     * @return string|null a instantiable class name or scalar data type ('integer', 'float', 'string', 'boolean')
      */
     public function resolve($className, $json): ?string;
 }
