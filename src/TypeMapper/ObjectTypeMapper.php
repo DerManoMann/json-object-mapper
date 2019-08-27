@@ -47,6 +47,12 @@ class ObjectTypeMapper extends AbstractTypeMapper
                 return $value;
             }
 
+            if (in_array($resolvedTypeClassName, ['integer', 'float', 'string', 'boolean'])) {
+                settype($value, $resolvedTypeClassName);
+
+                return $value;
+            }
+
             $obj = $this->instantiate($value, $resolvedTypeClassName);
         } else {
             throw new ObjectMapperException(sprintf('Unexpected type reference: %s', get_class($typeReference)));
