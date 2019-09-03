@@ -213,7 +213,8 @@ class JsonMapper
         try {
             return $this->getObjectMapper()->map(
                 (object) $json,
-                ($class ?
+                (
+                    $class ?
                     new CollectionTypeReference(new ClassTypeReference($class), \ArrayObject::class)
                     : new ObjectTypeReference(new \ArrayObject())
                 )
