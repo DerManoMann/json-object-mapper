@@ -27,6 +27,7 @@ class CollectionTypeReference implements TypeReferenceInterface
     /**
      * @param string|ClassTypeReference $valueType      String values are taken as build in data type
      * @param string                    $collectionType Collection class name
+     * @param bool                      $nullable       Indicate if the value can be null
      */
     public function __construct($valueType, $collectionType = null, bool $nullable = true)
     {
