@@ -30,6 +30,11 @@ class MagicPopo implements \JsonSerializable
     public $pubString = null;
     protected $properties = [];
 
+    public function all()
+    {
+        return $this->properties;
+    }
+
     public function __call($method, $args)
     {
         $name = lcfirst(substr($method, 3));

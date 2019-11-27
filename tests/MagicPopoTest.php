@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
-use Radebatz\ObjectMapper\PropertyInfo\PhpDocMagicExtractor;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractor;
 
 class MagicPopoTest extends TestCase
 {
@@ -23,17 +22,10 @@ class MagicPopoTest extends TestCase
      */
     protected function setUp()
     {
-        $phpDocMagicExtractor = new PhpDocMagicExtractor(new DocBlockCache());
-
-        $properties = $phpDocMagicExtractor->getProperties(Models\MagicPopo::class);
-        //var_dump($properties);
-
-        $types = $phpDocMagicExtractor->getTypes(Models\MagicPopo::class, 'proString');
-        $types = $phpDocMagicExtractor->getTypes(Models\MagicPopo::class, 'proInt');
-        $types = $phpDocMagicExtractor->getTypes(Models\MagicPopo::class, 'simplePopo');
-        //var_dump($types);
-
-        $this->markTestSkipped('TODO');
+        if (!($this->getObjectMapper()->getPropertyInfoExtractor() instanceof PropertyInfoExtraExtractor)) {
+            $this->markTestSkipped('PropertyInfoExtraExtractor not configured');
+        }
+        $this->markTestSkipped('PropertyInfoExtraExtractor WIP');
     }
 
     public function json()
@@ -54,7 +46,9 @@ class MagicPopoTest extends TestCase
 
         $popo1 = $objectMapper->map($json, Models\MagicPopo::class);
         $this->assertInstanceOf(Models\MagicPopo::class, $popo1);
+        $this->assertNotEmpty($popo1->all());
         $popo2 = $objectMapper->map(json_encode($popo1), Models\MagicPopo::class);
+        $this->assertNotEmpty($popo2->all());
         $this->assertEquals($popo1, $popo2);
     }
 }

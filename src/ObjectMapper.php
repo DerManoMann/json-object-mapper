@@ -14,7 +14,6 @@ namespace Radebatz\ObjectMapper;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Radebatz\ObjectMapper\NamingMapper\NoopNamingMapper;
-use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\TypeMapper\CollectionTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\NoopTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\ObjectTypeMapper;
@@ -23,6 +22,9 @@ use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ScalarTypeReference;
+use Radebatz\PropertyInfoExtras\Extractor\DocBlockCache;
+use Radebatz\PropertyInfoExtras\Extractor\DocBlockMagicExtractor;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractor;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -88,14 +90,17 @@ class ObjectMapper
     {
         $phpDocExtractor = new PhpDocExtractor();
         $reflectionExtractor = new ReflectionExtractor();
+        $docBlockMagicExtractor = new DocBlockMagicExtractor(new DocBlockCache());
 
         $listExtractors = [
             $reflectionExtractor,
+            $docBlockMagicExtractor,
         ];
 
         $typeExtractors = [
             $phpDocExtractor,
             $reflectionExtractor,
+            $docBlockMagicExtractor,
         ];
 
         $descriptionExtractors = [
@@ -106,7 +111,7 @@ class ObjectMapper
             $reflectionExtractor,
         ];
 
-        return new PropertyInfoExtractor(
+        return new PropertyInfoExtraExtractor(
             $listExtractors,
             $typeExtractors,
             $descriptionExtractors,
@@ -116,7 +121,10 @@ class ObjectMapper
 
     protected function getDefaultPropertyAccessor(): PropertyAccessor
     {
-        return PropertyAccess::createPropertyAccessor();
+        $propertyAccessorBuilder = PropertyAccess::createPropertyAccessorBuilder();
+        $propertyAccessorBuilder->enableMagicCall();
+
+        return $propertyAccessorBuilder->getPropertyAccessor();
     }
 
     public function getLogger(): LoggerInterface
