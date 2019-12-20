@@ -30,9 +30,11 @@ class MagicPopoTest extends TestCase
     public function json()
     {
         return [
-            ['{"pubString":"pub","proString":"pro","priString":"pri"}'],
-            ['{"pubString":null,"proString":null}'],
-            ['{"proInt":1,"proBool":false}'],
+            'strings' => ['{"pubString":"pub","proString":"pro","priString":"pri"}'],
+            'nulls' => ['{"pubString":null,"proString":null}'],
+            'mixed' => ['{"proInt":1,"proBool":false}'],
+            'simple' => ['{"simplePopo":{"proFloats":[1.23]}}'],
+            'empty' => ['{}'],
         ];
     }
 
