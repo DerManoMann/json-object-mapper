@@ -25,8 +25,11 @@ use Radebatz\ObjectMapper\TypeReference\ScalarTypeReference;
 use Radebatz\PropertyInfoExtras\Extractor\DocBlockCache;
 use Radebatz\PropertyInfoExtras\Extractor\DocBlockMagicExtractor;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractor;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorAdapter;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -49,7 +52,7 @@ class ObjectMapper
     protected $valueTypeResolvers = [];
     /** @var DocBlockCache */
     protected $docBlockCache = null;
-    /** @var PropertyInfoExtractor */
+    /** @var PropertyInfoExtraExtractorInterface */
     protected $propertyInfoExtractor = null;
     /** @var PropertyAccessor */
     protected $propertyAccessor = null;
@@ -70,6 +73,9 @@ class ObjectMapper
 
         $this->docBlockCache = $docBlockCache ?: new DocBlockCache();
         $this->propertyInfoExtractor = $propertyInfoExtractor ?: $this->getDefaultPropertyInfoExtractor();
+        if (!$this->propertyInfoExtractor instanceof PropertyInfoExtraExtractorInterface) {
+            $this->propertyInfoExtractor = new PropertyInfoExtraExtractorAdapter($this->propertyInfoExtractor);
+        }
         $this->propertyAccessor = $propertyAccess ?: $this->getDefaultPropertyAccessor();
     }
 
@@ -119,7 +125,7 @@ class ObjectMapper
         );
     }
 
-    protected function getDefaultPropertyAccessor(): PropertyAccessor
+    protected function getDefaultPropertyAccessor(): PropertyAccessorInterface
     {
         $propertyAccessorBuilder = PropertyAccess::createPropertyAccessorBuilder();
         $propertyAccessorBuilder->enableMagicCall();
@@ -198,7 +204,7 @@ class ObjectMapper
         return $this->propertyAccessor;
     }
 
-    public function getPropertyInfoExtractor(): PropertyInfoExtractor
+    public function getPropertyInfoExtractor(): PropertyInfoExtraExtractorInterface
     {
         return $this->propertyInfoExtractor;
     }
@@ -211,6 +217,8 @@ class ObjectMapper
      * @param mixed                                     $value   the value
      * @param null|string|object|TypeReferenceInterface $type    the target type
      * @param bool                                      $encoded if set to true, `string` values will be json_decoded; defaults to `true`
+     *
+     * @return mixed the mapping result
      */
     public function map($value, $type = null, bool $encoded = true)
     {

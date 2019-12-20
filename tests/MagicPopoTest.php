@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
-use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractor;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorInterface;
 
 class MagicPopoTest extends TestCase
 {
@@ -22,10 +22,9 @@ class MagicPopoTest extends TestCase
      */
     protected function setUp()
     {
-        if (!($this->getObjectMapper()->getPropertyInfoExtractor() instanceof PropertyInfoExtraExtractor)) {
+        if (!($this->getObjectMapper()->getPropertyInfoExtractor() instanceof PropertyInfoExtraExtractorInterface)) {
             $this->markTestSkipped('PropertyInfoExtraExtractor not configured');
         }
-        $this->markTestSkipped('PropertyInfoExtraExtractor WIP');
     }
 
     public function json()
