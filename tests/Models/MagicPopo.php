@@ -14,21 +14,38 @@ declare(strict_types=1);
 namespace Radebatz\ObjectMapper\Tests\Models;
 
 /**
- * @method string getProString()
+ * @method ?string getProString()
  * @method void setProString(?string $proString)
- * @method string getPriString()
+ * @method ?string getPriString()
  * @method void setPriString(?string $priString)
  * @method int getProInt()
  * @method void setProInt(int $proInt)
  * @method bool getProBool()
  * @method void setProBool(bool $proBool)
- * @method SimplePopo getSimplePopo()
- * @method void setSimplePopo(SimplePopo $simplePopo)
+ * @method ?SimplePopo getSimplePopo()
+ * @method void setSimplePopo(?SimplePopo $simplePopo)
  */
 class MagicPopo implements \JsonSerializable
 {
     public $pubString = null;
     protected $properties = [];
+
+    public function __construct()
+    {
+        $this->properties = [
+            'pubString' => null,
+            'proString' => null,
+            'priString' => null,
+            'proInt' => 0,
+            'proBool' => false,
+            'simplePopo' => null,
+        ];
+    }
+
+    public function all()
+    {
+        return $this->properties;
+    }
 
     public function __call($method, $args)
     {
@@ -42,7 +59,7 @@ class MagicPopo implements \JsonSerializable
             if (0 === strpos($method, 'set')) {
                 $this->properties[$name] = $args[0];
 
-                return;
+                return null;
             }
         }
 

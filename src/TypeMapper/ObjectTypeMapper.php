@@ -18,8 +18,8 @@ use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\TypeReference\TypeReferenceFactory;
 use Radebatz\ObjectMapper\TypeReferenceInterface;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 /**
  * Generic object type mapper.
@@ -65,7 +65,7 @@ class ObjectTypeMapper extends AbstractTypeMapper
         // keep track of mapped properties in case we want to verify required ones later
         $mappedProperties = [];
 
-        $properties = (array) $propertyInfoExtractor->getProperties(get_class($obj));
+        $properties = (array) $propertyInfoExtractor->getAllProperties(get_class($obj));
 
         foreach ((array) $value as $valueKey => $val) {
             $keys = array_map(function (NamingMapperInterface $namingMapper) use ($valueKey) {
@@ -107,10 +107,10 @@ class ObjectTypeMapper extends AbstractTypeMapper
         return $obj;
     }
 
-    protected function mapValue($obj, $key, $val, PropertyInfoExtractor $propertyInfoExtractor)
+    protected function mapValue($obj, $key, $val, PropertyInfoExtraExtractorInterface $propertyInfoExtractor)
     {
         $valueTypeReference = null;
-        if ($types = $propertyInfoExtractor->getTypes(get_class($obj), $key)) {
+        if ($types = $propertyInfoExtractor->getAllTypes(get_class($obj), $key)) {
             $valueTypeReference = TypeReferenceFactory::getTypeReferenceForType($types[0]);
         }
 

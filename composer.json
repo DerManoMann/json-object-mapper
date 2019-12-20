@@ -41,6 +41,7 @@
         "ext-json": "*",
         "phpdocumentor/reflection-docblock": "^4.3",
         "psr/log": "^1.0",
+        "radebatz/property-info-extras": "1.x-dev",
         "symfony/property-access": "^3.4|^4.0",
         "symfony/property-info": "^4.2"
     },

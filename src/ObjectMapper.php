@@ -14,7 +14,6 @@ namespace Radebatz\ObjectMapper;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Radebatz\ObjectMapper\NamingMapper\NoopNamingMapper;
-use Radebatz\ObjectMapper\PropertyInfo\DocBlockCache;
 use Radebatz\ObjectMapper\TypeMapper\CollectionTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\NoopTypeMapper;
 use Radebatz\ObjectMapper\TypeMapper\ObjectTypeMapper;
@@ -23,8 +22,14 @@ use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ScalarTypeReference;
+use Radebatz\PropertyInfoExtras\Extractor\DocBlockCache;
+use Radebatz\PropertyInfoExtras\Extractor\DocBlockMagicExtractor;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractor;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorAdapter;
+use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -47,7 +52,7 @@ class ObjectMapper
     protected $valueTypeResolvers = [];
     /** @var DocBlockCache */
     protected $docBlockCache = null;
-    /** @var PropertyInfoExtractor */
+    /** @var PropertyInfoExtraExtractorInterface */
     protected $propertyInfoExtractor = null;
     /** @var PropertyAccessor */
     protected $propertyAccessor = null;
@@ -68,6 +73,9 @@ class ObjectMapper
 
         $this->docBlockCache = $docBlockCache ?: new DocBlockCache();
         $this->propertyInfoExtractor = $propertyInfoExtractor ?: $this->getDefaultPropertyInfoExtractor();
+        if (!$this->propertyInfoExtractor instanceof PropertyInfoExtraExtractorInterface) {
+            $this->propertyInfoExtractor = new PropertyInfoExtraExtractorAdapter($this->propertyInfoExtractor);
+        }
         $this->propertyAccessor = $propertyAccess ?: $this->getDefaultPropertyAccessor();
     }
 
@@ -88,14 +96,17 @@ class ObjectMapper
     {
         $phpDocExtractor = new PhpDocExtractor();
         $reflectionExtractor = new ReflectionExtractor();
+        $docBlockMagicExtractor = new DocBlockMagicExtractor(new DocBlockCache());
 
         $listExtractors = [
             $reflectionExtractor,
+            $docBlockMagicExtractor,
         ];
 
         $typeExtractors = [
             $phpDocExtractor,
             $reflectionExtractor,
+            $docBlockMagicExtractor,
         ];
 
         $descriptionExtractors = [
@@ -106,7 +117,7 @@ class ObjectMapper
             $reflectionExtractor,
         ];
 
-        return new PropertyInfoExtractor(
+        return new PropertyInfoExtraExtractor(
             $listExtractors,
             $typeExtractors,
             $descriptionExtractors,
@@ -114,9 +125,12 @@ class ObjectMapper
         );
     }
 
-    protected function getDefaultPropertyAccessor(): PropertyAccessor
+    protected function getDefaultPropertyAccessor(): PropertyAccessorInterface
     {
-        return PropertyAccess::createPropertyAccessor();
+        $propertyAccessorBuilder = PropertyAccess::createPropertyAccessorBuilder();
+        $propertyAccessorBuilder->enableMagicCall();
+
+        return $propertyAccessorBuilder->getPropertyAccessor();
     }
 
     public function getLogger(): LoggerInterface
@@ -190,7 +204,7 @@ class ObjectMapper
         return $this->propertyAccessor;
     }
 
-    public function getPropertyInfoExtractor(): PropertyInfoExtractor
+    public function getPropertyInfoExtractor(): PropertyInfoExtraExtractorInterface
     {
         return $this->propertyInfoExtractor;
     }
@@ -203,6 +217,8 @@ class ObjectMapper
      * @param mixed                                     $value   the value
      * @param null|string|object|TypeReferenceInterface $type    the target type
      * @param bool                                      $encoded if set to true, `string` values will be json_decoded; defaults to `true`
+     *
+     * @return mixed the mapping result
      */
     public function map($value, $type = null, bool $encoded = true)
     {
