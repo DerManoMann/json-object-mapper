@@ -144,6 +144,8 @@ class JsonMapper
 
                         $this->jmLogger->log($level, $message, $context);
                     }
+
+                    return true;
                 }
             };
         }

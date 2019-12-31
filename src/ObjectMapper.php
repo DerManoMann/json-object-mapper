@@ -44,6 +44,8 @@ class ObjectMapper
     public const OPTION_INSTANTIATE_REQUIRE_CTOR = 'instantiateRequireCtor';
     public const OPTION_UNKNOWN_PROPERTY_HANDLER = 'unknownPropertyHandler';
 
+    /** @var array */
+    protected $options = [];
     /** @var LoggerInterface */
     protected $logger;
     /** @var array */
@@ -54,7 +56,7 @@ class ObjectMapper
     protected $docBlockCache = null;
     /** @var PropertyInfoExtraExtractorInterface */
     protected $propertyInfoExtractor = null;
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     protected $propertyAccessor = null;
     /** @var array */
     protected $objectTypeMappers = [];
@@ -92,7 +94,7 @@ class ObjectMapper
         ];
     }
 
-    protected function getDefaultPropertyInfoExtractor(): PropertyInfoExtractor
+    protected function getDefaultPropertyInfoExtractor(): PropertyInfoExtraExtractorInterface
     {
         $phpDocExtractor = new PhpDocExtractor();
         $reflectionExtractor = new ReflectionExtractor();
@@ -199,7 +201,7 @@ class ObjectMapper
         return $this->docBlockCache;
     }
 
-    public function getPropertyAccessor(): PropertyAccessor
+    public function getPropertyAccessor(): PropertyAccessorInterface
     {
         return $this->propertyAccessor;
     }

@@ -81,7 +81,7 @@ class NestedPopo implements \JsonSerializable
     }
 
     /**
-     * @param SimplePopo[]
+     * @param SimplePopo[] $proSimpleArr
      */
     public function setProSimpleArr(array $proSimpleArr)
     {
