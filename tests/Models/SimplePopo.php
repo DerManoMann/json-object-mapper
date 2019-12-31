@@ -76,7 +76,7 @@ class SimplePopo implements PopoInterface, \JsonSerializable
     }
 
     /**
-     * @param float[]
+     * @param float[] $proFloats
      */
     public function setProFloats(array $proFloats)
     {
@@ -102,7 +102,7 @@ class SimplePopo implements PopoInterface, \JsonSerializable
     }
 
     /**
-     * @param int
+     * @param int $weakTyped
      */
     public function setWeakTyped($weakTyped)
     {

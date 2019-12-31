@@ -36,6 +36,7 @@ class ObjectTypeMapper extends AbstractTypeMapper
         $propertyAccessor = $this->getObjectMapper()->getPropertyAccessor();
 
         $obj = null;
+        $resolvedTypeClassName = null;
         if ($typeReference instanceof ObjectTypeReference) {
             $obj = $typeReference->getObject();
         } elseif ($typeReference instanceof ClassTypeReference) {
@@ -59,7 +60,7 @@ class ObjectTypeMapper extends AbstractTypeMapper
         }
 
         if (!is_object($value) && $this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_TYPES)) {
-            throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=object', $key, $resolvedTypeClassName, gettype($value)));
+            throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=object', $key, $resolvedTypeClassName ?: 'N/A', gettype($value)));
         }
 
         // keep track of mapped properties in case we want to verify required ones later
