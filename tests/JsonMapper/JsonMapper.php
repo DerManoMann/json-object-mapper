@@ -171,12 +171,12 @@ class JsonMapper
 
                 public function resolve($className, $json): ?string
                 {
-                    if ($this->mapped) {
-                        return $this->mapped;
-                    }
-
-                    if ($this->resolver) {
-                        return call_user_func($this->resolver, $className, $json);
+                    if (ltrim($className, '\\') == ltrim($this->class, '\\')) {
+                        if ($this->mapped) {
+                            return $this->mapped;
+                        } elseif ($this->resolver) {
+                            return call_user_func($this->resolver, $className, $json);
+                        }
                     }
 
                     return null;

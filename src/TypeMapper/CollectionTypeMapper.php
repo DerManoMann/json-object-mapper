@@ -42,7 +42,7 @@ class CollectionTypeMapper extends AbstractTypeMapper
 
             $resolvedValueTypeClassName = $this->resolveValueType($valueTypeClassName, $value);
 
-            $obj = $this->instantiate($value, $resolvedValueTypeClassName);
+            list($obj, $ctorArg) = $this->instantiate($value, $resolvedValueTypeClassName);
         } elseif ($typeReference instanceof CollectionTypeReference) {
             if ($collectionType = $typeReference->getCollectionType()) {
                 $obj = new $collectionType();
