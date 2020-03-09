@@ -28,7 +28,6 @@ use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractor;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorAdapter;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -156,6 +155,9 @@ class ObjectMapper
         array_unshift($this->namingMappers, $namingMapper);
     }
 
+    /**
+     * @return NamingMapperInterface[]
+     */
     public function getNamingMappers(): array
     {
         return $this->namingMappers;
@@ -171,6 +173,9 @@ class ObjectMapper
         $this->valueTypeResolvers[] = $valueTypeResolver;
     }
 
+    /**
+     * @return ValueTypeResolverInterface[]
+     */
     public function getValueTypeResolvers(): array
     {
         return $this->valueTypeResolvers;
@@ -186,6 +191,9 @@ class ObjectMapper
         $this->objectTypeMappers[$className] = $objectTypeMapper;
     }
 
+    /**
+     * @return TypeMapperInterface[]
+     */
     public function getObjectTypeMappers(): array
     {
         return $this->objectTypeMappers;

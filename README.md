@@ -89,6 +89,7 @@ Default: `false`
 **`OPTION_INSTANTIATE_REQUIRE_CTOR`**
 ---
 If disabled, object instantiation will fall back to `ReflectionClass::newInstanceWithoutConstructor()` if a regular `new $class()` fails.
+Futhermore, if set it will enforce a constructor argument check in case a `scalar` is deserialized into an object.
 
 Default: `true`
 
@@ -97,7 +98,7 @@ Default: `true`
 Optional callable to handle unknown/unmappable properties.
 Signature:
 ```php
-funtion ($obj, $key, $value) {}
+function ($obj, $key, $value) {}
 ```
 The return value is epected to be either a property name or `null`.
 

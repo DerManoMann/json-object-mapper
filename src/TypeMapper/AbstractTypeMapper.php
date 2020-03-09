@@ -81,19 +81,22 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
     {
         try {
             $rc = new \ReflectionClass($className);
-            if (($ctor = $rc->getConstructor()) && $ctor->getParameters()) {
-                if (is_scalar($value)) {
-                    return new $className($value);
+            if (is_scalar($value)) {
+                if (!($ctor = $rc->getConstructor()) || $ctor->getParameters()) {
+                    if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_INSTANTIATE_REQUIRE_CTOR)) {
+                        throw new ObjectMapperException(sprintf('Unable to instantiate value object with ctor arg; class=%s', $className));
+                    }
                 }
+                return [new $className($value), true];
             }
 
-            return new $className();
+            return [new $className(), false];
         } catch (\ArgumentCountError $e) {
             if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_INSTANTIATE_REQUIRE_CTOR)) {
                 throw new ObjectMapperException(sprintf('Unable to instantiate value object; class=%s', $className), $e->getCode(), $e);
             }
 
-            return (new \ReflectionClass($className))->newInstanceWithoutConstructor();
+            return [(new \ReflectionClass($className))->newInstanceWithoutConstructor(), false];
         }
     }
 }

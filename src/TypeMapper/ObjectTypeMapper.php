@@ -37,6 +37,7 @@ class ObjectTypeMapper extends AbstractTypeMapper
 
         $obj = null;
         $resolvedTypeClassName = null;
+        $ctorArg = false;
         if ($typeReference instanceof ObjectTypeReference) {
             $obj = $typeReference->getObject();
         } elseif ($typeReference instanceof ClassTypeReference) {
@@ -54,13 +55,19 @@ class ObjectTypeMapper extends AbstractTypeMapper
                 return $value;
             }
 
-            $obj = $this->instantiate($value, $resolvedTypeClassName);
+            list($obj, $ctorArg) = $this->instantiate($value, $resolvedTypeClassName);
         } else {
             throw new ObjectMapperException(sprintf('Unexpected type reference: %s', get_class($typeReference)));
         }
 
-        if (!is_object($value) && $this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_TYPES)) {
-            throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=object', $key, $resolvedTypeClassName ?: 'N/A', gettype($value)));
+        if (!is_object($value)) {
+            if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_TYPES)) {
+                throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=object', $key, $resolvedTypeClassName ?: 'N/A', gettype($value)));
+            }
+
+            if ($ctorArg) {
+                return $obj;
+            }
         }
 
         // keep track of mapped properties in case we want to verify required ones later
