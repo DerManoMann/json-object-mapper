@@ -87,6 +87,7 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
                         throw new ObjectMapperException(sprintf('Unable to instantiate value object with ctor arg; class=%s', $className));
                     }
                 }
+
                 return [new $className($value), true];
             }
 

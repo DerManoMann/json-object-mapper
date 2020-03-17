@@ -9,6 +9,59 @@ use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\ValueTypeResolverInterface;
 
+class JsonMapperLoggerBase extends \Monolog\Logger
+{
+    protected $jmLogger;
+    protected $logMap;
+
+    public function __construct($jmLogger, $logMap)
+    {
+        parent::__construct('dummy');
+        $this->jmLogger = $jmLogger;
+        $this->logMap = $logMap;
+    }
+
+    public static function requiresMonolog2()
+    {
+        $rc = new \ReflectionClass(\Monolog\Logger::class);
+        $rm = $rc->getMethod('addRecord');
+
+        return $rm->hasReturnType();
+    }
+
+    protected function logMessage($level, $message, array $context = [])
+    {
+        if (array_key_exists($message, $this->logMap)) {
+            $mapped = $this->logMap[$message];
+            $level = $mapped[0];
+            $message = $mapped[1];
+            $context = $mapped[2] ?: $context;
+
+            $this->jmLogger->log($level, $message, $context);
+        }
+
+        return true;
+    }
+};
+
+if (JsonMapperLoggerBase::requiresMonolog2()) {
+    class JsonMapperLogger extends JsonMapperLoggerBase
+    {
+        public function addRecord(int $level, string $message, array $context = []): bool
+        {
+            return $this->logMessage($level, $message, $context);
+        }
+    }
+} else {
+    class JsonMapperLogger extends JsonMapperLoggerBase
+    {
+        public function addRecord($level, $message, array $context = [])
+        {
+            return $this->logMessage($level, $message, $context);
+        }
+    }
+}
+
 class JsonMapper
 {
     protected $jmLogger = null;
@@ -123,31 +176,7 @@ class JsonMapper
             $jmLogger = $this->jmLogger;
             $logMap = $this->logMap;
 
-            $logger = new class($jmLogger, $logMap) extends \Monolog\Logger {
-                protected $jmLogger;
-                protected $logMap;
-
-                public function __construct($jmLogger, $logMap)
-                {
-                    parent::__construct('dummy');
-                    $this->jmLogger = $jmLogger;
-                    $this->logMap = $logMap;
-                }
-
-                public function addRecord($level, $message, array $context = [])
-                {
-                    if (array_key_exists($message, $this->logMap)) {
-                        $mapped = $this->logMap[$message];
-                        $level = $mapped[0];
-                        $message = $mapped[1];
-                        $context = $mapped[2] ?: $context;
-
-                        $this->jmLogger->log($level, $message, $context);
-                    }
-
-                    return true;
-                }
-            };
+            $logger = new JsonMapperLogger($jmLogger, $logMap);
         }
 
         $objectMapper = new ObjectMapper([
