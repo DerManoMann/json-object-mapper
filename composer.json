@@ -39,7 +39,6 @@
     "require": {
         "php": ">=7.1",
         "ext-json": "*",
-        "phpdocumentor/reflection-docblock": "^4.3",
         "psr/log": "^1.0",
         "radebatz/property-info-extras": "1.x-dev",
         "symfony/property-access": "^4.0|^5.0"
