@@ -13,6 +13,7 @@ namespace Radebatz\ObjectMapper\TypeMapper;
 
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
+use Radebatz\ObjectMapper\DeserializerAwareInterface;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
@@ -46,6 +47,10 @@ class CollectionTypeMapper extends AbstractTypeMapper
         } elseif ($typeReference instanceof CollectionTypeReference) {
             if ($collectionType = $typeReference->getCollectionType()) {
                 $obj = new $collectionType();
+
+                if ($obj instanceof DeserializerAwareInterface) {
+                    $obj->instantiated($this->getObjectMapper());
+                }
             } else {
                 $obj = [];
             }
@@ -69,6 +74,10 @@ class CollectionTypeMapper extends AbstractTypeMapper
             } else {
                 $propertyAccessor->setValue($obj, $key, $val);
             }
+        }
+
+        if ($obj instanceof DeserializerAwareInterface) {
+            $obj->deserialized($this->getObjectMapper());
         }
 
         return $obj;

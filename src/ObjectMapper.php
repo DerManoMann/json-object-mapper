@@ -279,8 +279,7 @@ class ObjectMapper
                         }
                     }
 
-                // fall through
-                // no break
+                    return new ObjectTypeMapper($this);
 
                 default:
                     return new ObjectTypeMapper($this);
