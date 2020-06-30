@@ -14,6 +14,7 @@ namespace Radebatz\ObjectMapper\TypeMapper;
 use Radebatz\ObjectMapper\NamingMapperInterface;
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
+use Radebatz\ObjectMapper\DeserializerAwareInterface;
 use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\TypeReference\TypeReferenceFactory;
@@ -66,6 +67,10 @@ class ObjectTypeMapper extends AbstractTypeMapper
             }
 
             if ($ctorArg) {
+                if ($obj instanceof DeserializerAwareInterface) {
+                    $obj->deserialized($this->getObjectMapper());
+                }
+
                 return $obj;
             }
         }
@@ -110,6 +115,10 @@ class ObjectTypeMapper extends AbstractTypeMapper
 
         if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_VERIFY_REQUIRED)) {
             $this->verifyRequiredProperties(get_class($obj), $properties, $mappedProperties);
+        }
+
+        if ($obj instanceof DeserializerAwareInterface) {
+            $obj->deserialized($this->getObjectMapper());
         }
 
         return $obj;

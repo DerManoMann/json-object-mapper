@@ -13,6 +13,7 @@ namespace Radebatz\ObjectMapper\TypeMapper;
 
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\ObjectMapperException;
+use Radebatz\ObjectMapper\DeserializerAwareInterface;
 use Radebatz\ObjectMapper\TypeMapperInterface;
 
 abstract class AbstractTypeMapper implements TypeMapperInterface
@@ -80,18 +81,27 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
     protected function instantiate($value, string $className)
     {
         try {
-            $rc = new \ReflectionClass($className);
-            if (is_scalar($value)) {
+            $instance = null;
+            $ctorArg = false;
+            if (!is_scalar($value)) {
+                $instance = new $className();
+            } else {
+                $rc = new \ReflectionClass($className);
                 if (!($ctor = $rc->getConstructor()) || $ctor->getParameters()) {
                     if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_INSTANTIATE_REQUIRE_CTOR)) {
                         throw new ObjectMapperException(sprintf('Unable to instantiate value object with ctor arg; class=%s', $className));
                     }
                 }
 
-                return [new $className($value), true];
+                $instance = new $className($value);
+                $ctorArg = true;
             }
 
-            return [new $className(), false];
+            if ($instance instanceof DeserializerAwareInterface) {
+                $instance->instantiated($this->getObjectMapper());
+            }
+
+            return [$instance, $ctorArg];
         } catch (\ArgumentCountError $e) {
             if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_INSTANTIATE_REQUIRE_CTOR)) {
                 throw new ObjectMapperException(sprintf('Unable to instantiate value object; class=%s', $className), $e->getCode(), $e);
