@@ -50,6 +50,6 @@
         "netresearch/jsonmapper": "^3.0",
         "php-coveralls/php-coveralls": "^2.1",
         "phpunit/php-code-coverage": "^6.1|^7.0.5",
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^7.0 || ^8.0"
     }
 }
