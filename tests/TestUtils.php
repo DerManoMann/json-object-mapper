@@ -15,14 +15,11 @@ namespace Radebatz\ObjectMapper\Tests;
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Log\LoggerInterface;
 use Radebatz\ObjectMapper\ObjectMapper;
 
-class TestCase extends BaseTestCase
+trait TestUtils
 {
-    protected $objectMappers = [];
-
     /**
      * @throws \Exception
      */

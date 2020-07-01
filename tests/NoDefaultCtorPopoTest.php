@@ -13,19 +13,22 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Radebatz\ObjectMapper\ObjectMapper;
+use Radebatz\ObjectMapper\ObjectMapperException;
 
 class NoDefaultCtorPopoTest extends TestCase
 {
-    /**
-     * @expectedException \Radebatz\ObjectMapper\ObjectMapperException
-     * @expectedExceptionMessage Unable to instantiate value object; class=Radebatz\ObjectMapper\Tests\Models\NoDefaultCtorPopo
-     */
+    use TestUtils;
+
     public function testCtorValueFail()
     {
         $json = '{"value":"foo","other":false}';
 
         $objectMapper = $this->getObjectMapper();
+
+        $this->expectException(ObjectMapperException::class);
+        $this->expectExceptionMessage('Unable to instantiate value object; class=Radebatz\ObjectMapper\Tests\Models\NoDefaultCtorPopo');
 
         $objectMapper->map($json, Models\NoDefaultCtorPopo::class);
     }

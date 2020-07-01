@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Radebatz\ObjectMapper\Tests\Models\AnotherPopo;
 use Radebatz\ObjectMapper\Tests\Models\NestedPopo;
 use Radebatz\ObjectMapper\Tests\Models\PopoInterface;
@@ -21,6 +22,8 @@ use Radebatz\ObjectMapper\ValueTypeResolverInterface;
 
 class ValueTypeResolverTest extends TestCase
 {
+    use TestUtils;
+
     public function json()
     {
         $date = new \DateTime();

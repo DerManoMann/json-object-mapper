@@ -13,29 +13,36 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Radebatz\ObjectMapper\ObjectMapperException;
 
 class ScalarTypesTest extends TestCase
 {
+    use TestUtils;
+
     public function json()
     {
         return [
-            ['"a string"', 'a string', null, false],
-            ['1', 1, null, false],
-            ['false', false, null, false],
-            ['{"foo":"bar"}', (object) ['foo' => 'bar'], null, false],
-            [1, 1, null, false],
-            ['pong', 'pong', null, false, false],
-            [null, null, null, false],
-            ['false', false, \stdClass::class, ObjectMapperException::class],
-            [new \stdClass(), null, true, \InvalidArgumentException::class],
+            ['"pong"', '"pong"', null, null, false],
+            ['"pong"', 'pong', null, null, true],
+            ['pong', 'pong', null, null, false],
+            ['pong', null, null, null, true],
+            ['1', 1, null, null, false],
+            ['1', 1, null, null, true],
+            ['false', false, null, null, true],
+            ['{"foo":"bar"}', (object) ['foo' => 'bar'], null, null, true],
+            [1, 1, null, null, false],
+            [1, 1, null, null, true],
+            [null, null, null, null, false],
+            ['false', false, \stdClass::class, ObjectMapperException::class, true],
+            [new \stdClass(), null, true, \InvalidArgumentException::class, true],
         ];
     }
 
     /**
      * @dataProvider json
      */
-    public function testJson($json, $expected, $type, ?string $fail = null, $encoded = true)
+    public function testJson($json, $expected, $type, ?string $fail, $encoded)
     {
         $objectMapper = $this->getObjectMapper();
 

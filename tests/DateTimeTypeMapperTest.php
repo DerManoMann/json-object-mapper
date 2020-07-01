@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Radebatz\ObjectMapper\ObjectMapper;
 use Radebatz\ObjectMapper\Tests\Models\SimplePopo;
 use Radebatz\ObjectMapper\TypeMapper\DateTimeTypeMapper;
 
 class DateTimeTypeMapperTest extends TestCase
 {
+    use TestUtils;
+
     public function json()
     {
         $dt = new \DateTime();
