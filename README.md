@@ -6,7 +6,7 @@ A simple library to deserialize JSON into (nested) PHP  arrays / objects.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Requirements ##
-* [PHP 7.1 or higher](http://www.php.net/)
+* [PHP 7.2 or higher](http://www.php.net/)
 
 ## Installation ##
 
