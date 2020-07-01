@@ -13,14 +13,17 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorInterface;
 
 class MagicPopoTest extends TestCase
 {
+    use TestUtils;
+
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!($this->getObjectMapper()->getPropertyInfoExtractor() instanceof PropertyInfoExtraExtractorInterface)) {
             $this->markTestSkipped('PropertyInfoExtraExtractor not configured');

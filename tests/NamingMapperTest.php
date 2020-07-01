@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace Radebatz\ObjectMapper\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
 use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
 
 class NamingMapperTest extends TestCase
 {
+    use TestUtils;
+
     public function snakeNames()
     {
         return [
