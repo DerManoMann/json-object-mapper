@@ -1,7 +1,7 @@
 # (JSON) object mapper #
 A simple library to deserialize JSON into (nested) PHP  arrays / objects.
 
-[![Build Status](![build](https://github.com/DerManoMann/json-object-mapper/workflows/build/badge.svg))](https://github.com/DerManoMann/json-object-mapper/actions?query=workflow:build)
+[![Build Status](https://github.com/DerManoMann/json-object-mapper/workflows/build/badge.svg)](https://github.com/DerManoMann/json-object-mapper/actions?query=workflow:build)
 [![Coverage Status](https://coveralls.io/repos/github/DerManoMann/json-object-mapper/badge.svg)](https://coveralls.io/github/DerManoMann/json-object-mapper)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
