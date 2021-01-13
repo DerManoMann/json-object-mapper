@@ -13,7 +13,7 @@ class VariadicPropertyAccessor extends PropertyAccessor
     {
         try {
             return parent::setValue($objectOrArray, $propertyPath, $value);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException|\TypeError $e) {
             if (!$this->setVariadic($objectOrArray, $propertyPath, $value)) {
                 throw $e;
             }
