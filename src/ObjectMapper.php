@@ -22,12 +22,14 @@ use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ScalarTypeReference;
+use Radebatz\ObjectMapper\Utils\VariadicPropertyAccessor;
 use Radebatz\PropertyInfoExtras\Extractor\DocBlockCache;
 use Radebatz\PropertyInfoExtras\Extractor\DocBlockMagicExtractor;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractor;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorAdapter;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -77,6 +79,7 @@ class ObjectMapper
         if (!$this->propertyInfoExtractor instanceof PropertyInfoExtraExtractorInterface) {
             $this->propertyInfoExtractor = new PropertyInfoExtraExtractorAdapter($this->propertyInfoExtractor);
         }
+
         $this->propertyAccessor = $propertyAccess ?: $this->getDefaultPropertyAccessor();
     }
 
@@ -128,10 +131,9 @@ class ObjectMapper
 
     protected function getDefaultPropertyAccessor(): PropertyAccessorInterface
     {
-        $propertyAccessorBuilder = PropertyAccess::createPropertyAccessorBuilder();
-        $propertyAccessorBuilder->enableMagicCall();
+        $propertyAccessor = new VariadicPropertyAccessor(PropertyAccessor::MAGIC_CALL);
 
-        return $propertyAccessorBuilder->getPropertyAccessor();
+        return $propertyAccessor;
     }
 
     public function getLogger(): LoggerInterface

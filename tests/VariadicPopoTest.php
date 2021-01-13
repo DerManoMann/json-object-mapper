@@ -15,16 +15,14 @@ namespace Radebatz\ObjectMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-class SimplePopoTest extends TestCase
+class VariadicPopoTest extends TestCase
 {
     use TestUtils;
 
     public function json()
     {
         return [
-            ['{"pubString":"pub","proString":"pro","priString":"pri","proInt":0,"proBool":true,"proFloats":[],"date":null,"mixed":0}'],
-            ['{"pubString":null,"proString":null,"priString":null,"proInt":0,"proBool":true,"proFloats":[],"date":null,"mixed":0}'],
-            ['{"pubString":null,"proString":null,"priString":null,"proInt":1,"proBool":false,"proFloats":[],"date":null,"mixed":0}'],
+            ['{"varPopos":[{"foo":null},{"foo":null}]}'],
         ];
     }
 
@@ -35,10 +33,10 @@ class SimplePopoTest extends TestCase
     {
         $objectMapper = $this->getObjectMapper();
 
-        $popo1 = $objectMapper->map($json, Models\SimplePopo::class);
-        $this->assertInstanceOf(Models\SimplePopo::class, $popo1);
+        $popo1 = $objectMapper->map($json, Models\VariadicPopo::class);
+        $this->assertInstanceOf(Models\VariadicPopo::class, $popo1);
         $this->assertEquals($json, json_encode($popo1));
-        $popo2 = $objectMapper->map(json_encode($popo1), Models\SimplePopo::class);
+        $popo2 = $objectMapper->map(json_encode($popo1), Models\VariadicPopo::class);
         $this->assertEquals($popo1, $popo2);
         $this->assertEquals($json, json_encode($popo2));
     }
