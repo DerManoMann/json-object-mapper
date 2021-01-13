@@ -14,10 +14,21 @@ declare(strict_types=1);
 namespace Radebatz\ObjectMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Radebatz\ObjectMapper\ObjectMapper;
+use Radebatz\ObjectMapper\Utils\VariadicPropertyAccessor;
 
 class VariadicPopoTest extends TestCase
 {
     use TestUtils;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (!$this->getObjectMapper([ObjectMapper::OPTION_VARIADIC_SETTER => true])->getPropertyAccessor() instanceof VariadicPropertyAccessor) {
+            $this->markTestSkipped('requires VariadicPropertyAccessor');
+        }
+    }
 
     public function json()
     {
@@ -31,7 +42,7 @@ class VariadicPopoTest extends TestCase
      */
     public function testJson($json)
     {
-        $objectMapper = $this->getObjectMapper();
+        $objectMapper = $this->getObjectMapper([ObjectMapper::OPTION_VARIADIC_SETTER => true]);
 
         $popo1 = $objectMapper->map($json, Models\VariadicPopo::class);
         $this->assertInstanceOf(Models\VariadicPopo::class, $popo1);

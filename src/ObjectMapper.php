@@ -44,6 +44,7 @@ class ObjectMapper
     public const OPTION_VERIFY_REQUIRED = 'verifyRequired';
     public const OPTION_INSTANTIATE_REQUIRE_CTOR = 'instantiateRequireCtor';
     public const OPTION_UNKNOWN_PROPERTY_HANDLER = 'unknownPropertyHandler';
+    public const OPTION_VARIADIC_SETTER = 'variadicSetter';
 
     /** @var array */
     protected $options = [];
@@ -93,6 +94,7 @@ class ObjectMapper
             self::OPTION_VERIFY_REQUIRED => false,
             self::OPTION_INSTANTIATE_REQUIRE_CTOR => true,
             self::OPTION_UNKNOWN_PROPERTY_HANDLER => null,
+            self::OPTION_VARIADIC_SETTER => false,
         ];
     }
 
@@ -131,7 +133,13 @@ class ObjectMapper
 
     protected function getDefaultPropertyAccessor(): PropertyAccessorInterface
     {
-        $propertyAccessor = new VariadicPropertyAccessor(PropertyAccessor::MAGIC_CALL);
+        if ($this->isOption(self::OPTION_VARIADIC_SETTER) && defined(sprintf('%s::MAGIC_CALL', PropertyAccessor::class))) {
+            $propertyAccessor = new VariadicPropertyAccessor(PropertyAccessor::MAGIC_CALL);
+        } else {
+            $propertyAccessorBuilder = PropertyAccess::createPropertyAccessorBuilder();
+            $propertyAccessorBuilder->enableMagicCall();
+            $propertyAccessor = $propertyAccessorBuilder->getPropertyAccessor();
+        }
 
         return $propertyAccessor;
     }
