@@ -104,6 +104,21 @@ The return value is epected to be either a property name or `null`.
 
 Default: `null`
 
+**`OPTION_VARIADIC_SETTER`**
+---
+If enabled, setting list values will allow variadic parameters on models (requires `5.2 >= PropertyAccess`).
+```php
+class Model {
+  private $list = [];
+  public function setList(ListModel ... $listModels) {
+    $this->list = $listModels;  
+  }
+}
+```
+The return value is epected to be either a property name or `null`.
+
+Default: `false`
+
 
 ## Testing ##
 This package is inspired by the excellent [jsonmapper](https://github.com/cweiske/jsonmapper) package.

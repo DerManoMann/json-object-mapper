@@ -22,12 +22,14 @@ use Radebatz\ObjectMapper\TypeReference\ClassTypeReference;
 use Radebatz\ObjectMapper\TypeReference\CollectionTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ObjectTypeReference;
 use Radebatz\ObjectMapper\TypeReference\ScalarTypeReference;
+use Radebatz\ObjectMapper\Utils\VariadicPropertyAccessor;
 use Radebatz\PropertyInfoExtras\Extractor\DocBlockCache;
 use Radebatz\PropertyInfoExtras\Extractor\DocBlockMagicExtractor;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractor;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorAdapter;
 use Radebatz\PropertyInfoExtras\PropertyInfoExtraExtractorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -42,6 +44,7 @@ class ObjectMapper
     public const OPTION_VERIFY_REQUIRED = 'verifyRequired';
     public const OPTION_INSTANTIATE_REQUIRE_CTOR = 'instantiateRequireCtor';
     public const OPTION_UNKNOWN_PROPERTY_HANDLER = 'unknownPropertyHandler';
+    public const OPTION_VARIADIC_SETTER = 'variadicSetter';
 
     /** @var array */
     protected $options = [];
@@ -77,6 +80,7 @@ class ObjectMapper
         if (!$this->propertyInfoExtractor instanceof PropertyInfoExtraExtractorInterface) {
             $this->propertyInfoExtractor = new PropertyInfoExtraExtractorAdapter($this->propertyInfoExtractor);
         }
+
         $this->propertyAccessor = $propertyAccess ?: $this->getDefaultPropertyAccessor();
     }
 
@@ -90,6 +94,7 @@ class ObjectMapper
             self::OPTION_VERIFY_REQUIRED => false,
             self::OPTION_INSTANTIATE_REQUIRE_CTOR => true,
             self::OPTION_UNKNOWN_PROPERTY_HANDLER => null,
+            self::OPTION_VARIADIC_SETTER => false,
         ];
     }
 
@@ -128,10 +133,15 @@ class ObjectMapper
 
     protected function getDefaultPropertyAccessor(): PropertyAccessorInterface
     {
-        $propertyAccessorBuilder = PropertyAccess::createPropertyAccessorBuilder();
-        $propertyAccessorBuilder->enableMagicCall();
+        if ($this->isOption(self::OPTION_VARIADIC_SETTER) && defined(sprintf('%s::MAGIC_CALL', PropertyAccessor::class))) {
+            $propertyAccessor = new VariadicPropertyAccessor(PropertyAccessor::MAGIC_CALL);
+        } else {
+            $propertyAccessorBuilder = PropertyAccess::createPropertyAccessorBuilder();
+            $propertyAccessorBuilder->enableMagicCall();
+            $propertyAccessor = $propertyAccessorBuilder->getPropertyAccessor();
+        }
 
-        return $propertyAccessorBuilder->getPropertyAccessor();
+        return $propertyAccessor;
     }
 
     public function getLogger(): LoggerInterface
