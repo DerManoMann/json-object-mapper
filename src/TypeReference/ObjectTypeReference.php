@@ -22,6 +22,10 @@ class ObjectTypeReference implements TypeReferenceInterface
 
     public function __construct($obj)
     {
+        if (!is_object($obj)) {
+            throw new \InvalidArgumentException('Expecting object.');
+        }
+
         $this->obj = $obj;
     }
 
@@ -39,6 +43,14 @@ class ObjectTypeReference implements TypeReferenceInterface
     public function isNullable()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType(): string
+    {
+        return get_class($this->getObject());
     }
 
     public function getObject()

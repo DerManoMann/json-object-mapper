@@ -43,6 +43,14 @@ class ClassTypeReference implements TypeReferenceInterface
         return $this->nullable;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getType(): string
+    {
+        return $this->getClassName();
+    }
+
     public function getClassName(): string
     {
         return $this->className;

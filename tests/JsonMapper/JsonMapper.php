@@ -97,13 +97,13 @@ class JsonMapper
         => 'JSON property "privateNoSetter" has no public setter method in object of type PrivateWithSetter',
         'Type must not be null'
         => 'JsonMapper::map() requires second argument to be an object, NULL given.',
-        'Incompatible data type; class=ArrayObject, json=double'
+        'Incompatible value type; key=pArrayObject, type=double, expected=ArrayObject'
         => 'JSON property "pArrayObject" must be an array, double given',
-        'Invalid collection value; name=flArray, type=integer'
+        'Incompatible value type; key=flArray, type=integer, expected=array<float>'
         => 'JSON property "flArray" must be an array, integer given',
         'Unable to instantiate value object; class=\JsonMapperTest_ValueObject'
         => 'JSON property "pValueObject" must be an object, string given',
-        'Incompatible data type; name=pValueObject, class=JsonMapperTest_ValueObject, type=string, expected=object'
+        'Incompatible value type; key=pValueObject, type=string, expected=JsonMapperTest_ValueObject'
         => 'JSON property "pValueObject" must be an object, string given',
         'Unmapped property; name=privatePropertyPrivateSetter, class=PrivateWithSetter'
         => 'JSON property "privatePropertyPrivateSetter" has no public setter method in object of type PrivateWithSetter',
@@ -117,9 +117,9 @@ class JsonMapper
         => 'JSON property "pArrayObject" must be an array, double given',
         'Could not determine access type for property "privatePropertyPrivateSetter" in class "PrivateWithSetter": Neither the property "privatePropertyPrivateSetter" nor one of the methods "addPrivatePropertyPrivateSetter()"/"removePrivatePropertyPrivateSetter()", "setPrivatePropertyPrivateSetter()", "privatePropertyPrivateSetter()", "__set()" or "__call()" exist and have public access in class "PrivateWithSetter".'
         => 'JSON property "privatePropertyPrivateSetter" has no public setter method in object of type PrivateWithSetter',
-        'Incompatible data type; key=0, type=object, expected=string'
+        'Incompatible value type; key=strArray, type=array, expected=array<string>'
         => 'JSON property "strArray" is an array of type "string" but contained a value of type "object"',
-        'Incompatible data type; key=pString, type=object, expected=string'
+        'Incompatible value type; key=pString, type=object, expected=string'
         => 'JSON property "pString" in class "JsonMapperTest_Object" is an object and cannot be converted to a string',
     ];
     private $logMap = [
