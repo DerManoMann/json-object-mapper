@@ -46,10 +46,10 @@ $objectMapper = new \Radebatz\ObjectMapper\ObjectMapper();
 
 $json = '{"foo":"bar"}';
 
-/** @var \MyData $myData */
-$myData = $objectMapper->map($json, \MyData::class);
+/** @var \MyClass $obj */
+$obj = $objectMapper->map($json, \MyClass::class);
 
-echo $myData->getFoo(); // echo's 'bar'
+echo $obj->getFoo(); // echo's 'bar'
 ````
 
 ## Configuration ##
@@ -115,7 +115,7 @@ class Model {
   }
 }
 ```
-The return value is epected to be either a property name or `null`.
+The return value is expected to be either a property name or `null`.
 
 Default: `false`
 
