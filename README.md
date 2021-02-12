@@ -24,8 +24,11 @@ Once composer is installed, execute the following command in your project root t
 composer require radebatz/object-mapper
 ```
 
-## Basic usage ##
-````
+## Usage ##
+### Simple model using getXXX()/setXXX() ###
+```php
+use Radebatz\ObjectMapper\ObjectMapper;
+
 class MyClass 
 {
     protected $foo;
@@ -42,15 +45,88 @@ class MyClass
 }
 
     
-$objectMapper = new \Radebatz\ObjectMapper\ObjectMapper();
+$objectMapper = new ObjectMapper();
 
 $json = '{"foo":"bar"}';
 
 /** @var \MyClass $obj */
 $obj = $objectMapper->map($json, \MyClass::class);
 
-echo $obj->getFoo(); // echo's 'bar'
-````
+echo $obj->getFoo(); // 'bar'
+```
+
+### Value union using interface ###
+```php
+use Radebatz\ObjectMapper\ObjectMapper;
+use Radebatz\ObjectMapper\ValueTypeResolverInterface;
+
+interface ValueInterface
+{
+    public function getType(): string;
+}
+
+class Tree implements ValueInterface
+{
+    public function getType(): string
+    {
+        return "tree";
+    }
+}
+
+class Flower implements ValueInterface
+{
+    public function getType(): string
+    {
+        return "flower";
+    }
+}
+
+$objectMapper = new ObjectMapper();
+$objectMapper->addValueTypeResolver(
+    new class() implements ValueTypeResolverInterface {
+        public function resolve($className, $json): ?string
+        {
+            if (is_object($json) && \ValueInterface::class == $className) {
+                if (property_exists($json, 'type')) {
+                    switch ($json->type) {
+                        case 'tree':
+                            return \Tree::class;
+                        case 'flower':
+                            return \Flower::class;
+                    }
+                }
+            }
+
+            return null;
+        }
+    }
+);
+
+$json = '{"type": "flower"}';
+
+/** @var \ValueInterface $obj */
+$obj = $objectMapper->map($json, \ValueInterface::class);
+
+echo get_class($obj); // '\Flower'
+
+```
+        $objectMapper->addValueTypeResolver(
+            new class() implements ValueTypeResolverInterface {
+                public function resolve($className, $json): ?string
+                {
+                    if (is_object($json) && PopoInterface::class == $className) {
+                        if (property_exists($json, 'foo')) {
+                            return AnotherPopo::class;
+                        }
+
+                        return SimplePopo::class;
+                    }
+
+                    return null;
+                }
+            }
+        );
+
 
 ## Configuration ##
 The `ObjectMapper` class takes an array (map) as first constructor argument which allows to customise the behaviour when mapping data.
@@ -122,18 +198,18 @@ Default: `false`
 
 ## Testing ##
 This package is inspired by the excellent [jsonmapper](https://github.com/cweiske/jsonmapper) package.
-In order to evaluate its features, the tests folder contains an adapter that lets you run the ````jsonmapper```` test suite agaist the ````json-object-manager```` codebase.
+In order to evaluate its features, the tests folder contains an adapter that lets you run the ```jsonmapper``` test suite agaist the ```json-object-manager``` codebase.
 
 For this you run:
 
-````
+```sh
 rm -rf vendor/netresearch/jsonmapper && composer install --prefer-source
 ./vendor/bin/phpunit -c phpunit.xml.jsonmapper
-```` 
+``` 
 
 Not all tests pass as this library support also, for example, mapping scalar values. As it stands the result of running the tests is:
 
-```$sh
+```sh
 Tests: 100, Assertions: 236, Errors: 2, Failures: 12.  (jsonmapper 3.x)
 Tests: 102, Assertions: 247, Errors: 2, Failures: 12.  (jsonmapper 4.x)
 ```
