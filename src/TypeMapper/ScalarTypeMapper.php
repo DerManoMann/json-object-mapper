@@ -75,7 +75,7 @@ class ScalarTypeMapper extends AbstractTypeMapper implements SimpleTypeMapperInt
             'boolean' => [
                 'type' => 'boolean',
                 'strict' => [],
-                'compatible' => ['string'],
+                'compatible' => ['string', 'integer'],
             ],
             'string' => [
                 'type' => 'string',

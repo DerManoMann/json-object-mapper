@@ -19,4 +19,9 @@ interface TypeReferenceInterface
     public function isCollection(): bool;
 
     public function isNullable();
+
+    /**
+     * Return a strng representation of the underlying type.
+     */
+    public function getType(): string;
 }

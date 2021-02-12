@@ -126,18 +126,39 @@ class ObjectTypeMapper extends AbstractTypeMapper
 
     protected function mapValue($obj, $key, $val, PropertyInfoExtraExtractorInterface $propertyInfoExtractor)
     {
-        $valueTypeReference = null;
+        // default for untyped data
+        $valueTypeReferences = [null];
         if ($types = $propertyInfoExtractor->getAllTypes(get_class($obj), $key)) {
-            $valueTypeReference = TypeReferenceFactory::getTypeReferenceForType($types[0]);
+            $valueTypeReferences = array_map(function ($type) {
+                return TypeReferenceFactory::getTypeReferenceForType($type);
+            }, $types);
         }
 
-        if (null === $val && $valueTypeReference && !$valueTypeReference->isNullable()
+        if (null === $val && $valueTypeReferences
+            && !array_reduce($valueTypeReferences, function ($carry, $item) {
+                return $carry || null === $item || $item->isNullable();
+            }, false)
             && $this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_NULL)) {
             throw new ObjectMapperException(sprintf('Unmappable null value; name=%s, class=%s', $key, get_class($obj)));
         }
 
-        $valueTypeMapper = $this->getObjectMapper()->getTypeMapper($val, $valueTypeReference);
+        foreach ($valueTypeReferences as $valueTypeReference) {
+            try {
+                $valueTypeMapper = $this->getObjectMapper()->getTypeMapper($val, $valueTypeReference);
 
-        return $valueTypeMapper->map($val, $valueTypeReference, $key);
+                return $valueTypeMapper->map($val, $valueTypeReference, $key);
+            } catch (ObjectMapperException $e) {
+                // ignore
+            }
+        }
+
+        throw new ObjectMapperException(sprintf(
+            'Incompatible value type; key=%s, type=%s, expected=%s',
+            $key,
+            gettype($val),
+            implode(', ', array_map(function ($valueTypeReference) {
+                return $valueTypeReference->getType();
+            }, $valueTypeReferences))
+        ), 0, 1 === count($valueTypeReferences) ? $e : null);
     }
 }

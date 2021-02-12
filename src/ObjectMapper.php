@@ -67,7 +67,7 @@ class ObjectMapper
     {
         $this->options = array_merge($this->getDefaultOptions(), $options);
         if ($this->options[self::OPTION_UNKNOWN_PROPERTY_HANDLER] && !is_callable($this->options[self::OPTION_UNKNOWN_PROPERTY_HANDLER])) {
-            throw new ObjectMapperException('Option "unknownPropertyHandler" must be callable');
+            throw new ObjectMapperException(sprintf('Option "%s" must be callable', self::OPTION_UNKNOWN_PROPERTY_HANDLER));
         }
         $this->logger = $logger ?: new NullLogger();
 

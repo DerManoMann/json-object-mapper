@@ -21,7 +21,7 @@ class ScalarTypeReference implements TypeReferenceInterface
     protected $scalarType;
     protected $nullable;
 
-    public function __construct(string $scalarType, bool $nullable)
+    public function __construct(string $scalarType, bool $nullable = true)
     {
         $this->scalarType = $scalarType;
         $this->nullable = $nullable;
@@ -41,6 +41,14 @@ class ScalarTypeReference implements TypeReferenceInterface
     public function isNullable()
     {
         return $this->nullable;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType(): string
+    {
+        return $this->getScalarType();
     }
 
     public function getScalarType(): string
