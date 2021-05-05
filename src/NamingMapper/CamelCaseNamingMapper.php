@@ -29,7 +29,7 @@ class CamelCaseNamingMapper implements NamingMapperInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function resolve($name)
     {

@@ -21,7 +21,7 @@ class MagicPopoTest extends TestCase
     use TestUtils;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function setUp(): void
     {

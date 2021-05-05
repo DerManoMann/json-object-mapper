@@ -28,13 +28,13 @@ class DeserializerAwareCollection extends \ArrayObject implements DeserializerAw
         return $this->aware;
     }
 
-    /** {@inheritdoc} */
+    /** @inheritdoc */
     public function instantiated(ObjectMapper $objectMapper): void
     {
         $this->aware .= 'i:' . $this->count();
     }
 
-    /** {@inheritdoc} */
+    /** @inheritdoc */
     public function deserialized(ObjectMapper $objectMapper): void
     {
         $this->aware .= 'd:' . $this->count();

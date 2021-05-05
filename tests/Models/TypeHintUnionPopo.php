@@ -28,7 +28,7 @@ class TypeHintUnionPopo implements PopoInterface, \JsonSerializable
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function jsonSerialize()
     {

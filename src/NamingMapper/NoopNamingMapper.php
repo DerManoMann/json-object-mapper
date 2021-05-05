@@ -21,7 +21,7 @@ use Radebatz\ObjectMapper\NamingMapperInterface;
 class NoopNamingMapper implements NamingMapperInterface
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function resolve($name)
     {

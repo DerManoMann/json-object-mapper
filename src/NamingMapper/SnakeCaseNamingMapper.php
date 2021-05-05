@@ -23,7 +23,7 @@ class SnakeCaseNamingMapper implements NamingMapperInterface
     protected $cache = [];
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function resolve($name)
     {
