@@ -39,7 +39,7 @@ class NoDefaultCtorPopo implements \JsonSerializable
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function jsonSerialize()
     {

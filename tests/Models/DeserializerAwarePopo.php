@@ -39,13 +39,13 @@ class DeserializerAwarePopo implements DeserializerAwareInterface
         return $this->aware;
     }
 
-    /** {@inheritdoc} */
+    /** @inheritdoc */
     public function instantiated(ObjectMapper $objectMapper): void
     {
         $this->aware .= 'i:' . $this->proString;
     }
 
-    /** {@inheritdoc} */
+    /** @inheritdoc */
     public function deserialized(ObjectMapper $objectMapper): void
     {
         $this->aware .= 'd:' . $this->proString;
