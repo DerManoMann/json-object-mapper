@@ -76,6 +76,9 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
     }
 
     /**
+     * @param mixed        $value
+     * @param class-string $className
+     *
      * @throws \ReflectionException
      */
     protected function instantiate($value, string $className)
@@ -85,6 +88,12 @@ abstract class AbstractTypeMapper implements TypeMapperInterface
             $ctorArg = false;
             if (!is_scalar($value)) {
                 $instance = new $className();
+            } elseif (function_exists('enum_exists') && enum_exists($className)) {
+                if (in_array(\BackedEnum::class, class_implements($className))) {
+                    $instance = $className::from($value);
+                } else {
+                    $instance = (new \ReflectionEnum($className))->getCase($value)->getValue();
+                }
             } else {
                 $rc = new \ReflectionClass($className);
                 if (!($ctor = $rc->getConstructor()) || $ctor->getParameters()) {
