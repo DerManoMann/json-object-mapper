@@ -62,6 +62,10 @@ class ObjectTypeMapper extends AbstractTypeMapper
         }
 
         if (!is_object($value)) {
+            if (($obj instanceof \UnitEnum)) {
+                return $obj;
+            }
+
             if ($this->getObjectMapper()->isOption(ObjectMapper::OPTION_STRICT_TYPES)) {
                 throw new ObjectMapperException(sprintf('Incompatible data type; name=%s, class=%s, type=%s, expected=object', $key, $resolvedTypeClassName ?: 'N/A', gettype($value)));
             }

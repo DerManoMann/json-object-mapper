@@ -41,6 +41,9 @@ class TypeReferenceFactory
                 case Type::BUILTIN_TYPE_RESOURCE:
                 case Type::BUILTIN_TYPE_ITERABLE:
                     throw new ObjectMapperException(sprintf('Invalid value type: %s', $buildInType));
+
+                default:
+                    throw new ObjectMapperException(sprintf('Unknown value type: %s', $buildInType));
             }
         }
 
