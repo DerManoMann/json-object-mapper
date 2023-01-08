@@ -29,6 +29,7 @@ class UnionPopoTest extends TestCase
 
     /**
      * @dataProvider json
+     *
      * @requires PHP 8
      */
     public function testTypeHint($json)

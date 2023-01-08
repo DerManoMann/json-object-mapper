@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\DateTimeImmutable;
 use Radebatz\ObjectMapper\DeserializerAwareInterface;
 use Radebatz\ObjectMapper\NamingMapper\CamelCaseNamingMapper;
 use Radebatz\ObjectMapper\NamingMapper\SnakeCaseNamingMapper;
@@ -48,7 +49,7 @@ class JsonMapperLoggerBase extends \Monolog\Logger
 if (JsonMapperLoggerBase::requiresMonolog2()) {
     class JsonMapperLogger extends JsonMapperLoggerBase
     {
-        public function addRecord(int $level, string $message, array $context = []): bool
+        public function addRecord(int $level, string $message, array $context = [], ?DateTimeImmutable $datetime = null): bool
         {
             return $this->logMessage($level, $message, $context);
         }
